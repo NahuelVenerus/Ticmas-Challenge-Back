@@ -33,7 +33,7 @@ export class UserService {
       const hashedPassword = await bcrypt.hash(userDTO.password, 10);
 
       const createdUser = this.userRepository.create({ ...userDTO, password: hashedPassword });
-      return this.userRepository.save(createdUser);
+      return await this.userRepository.save(createdUser);
    }
 
    async editUser(userId: number, userEditDTO: UserEditDTO): Promise<UserEditDTO> {
@@ -62,10 +62,8 @@ export class UserService {
       const isCurrentPasswordValid: boolean = await bcrypt.compare(userPasswordDTO.currentPassword, foundUser.password)
       if (!isCurrentPasswordValid) throw new Error('Current password is incorrect');
       if (userPasswordDTO.currentPassword === userPasswordDTO.newPassword) throw new Error("New password can't be the same as the current password");
-      console.log("Found User Pre: ", foundUser.password);
       foundUser.password = await bcrypt.hash(userPasswordDTO.newPassword, 10);
       await this.userRepository.save(foundUser);
-      console.log("Found User Post: ", foundUser.password);
       
       return true;
    }

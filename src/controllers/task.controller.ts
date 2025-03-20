@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query } from '@nestjs/common';
 import { TaskDTO } from 'src/DTOs/task.dto';
 import { TaskEditDTO } from 'src/DTOs/task_edit.dto';
 import { Task } from 'src/entities/task.entity';
@@ -19,8 +19,10 @@ export class TasksController {
     }
 
     @Get('/user/:userId')
-    async getUserTasks(@Param('userId') userId: number): Promise<Task[]> {
-        return await this.taskService.getUserTasks(userId);
+    async getUserTasks(
+        @Param('userId') userId: number, 
+        @Query('archived') archived: boolean): Promise<Task[]> {
+        return await this.taskService.getUserTasks(userId, archived);
     }
 
     @Post('/create')
@@ -31,22 +33,27 @@ export class TasksController {
     }
 
     @Put('/edit/:taskId')
-    async editTask(@Param('taskId') taskId: number, @Body() taskEditDTO: TaskEditDTO): Promise<Task> {
+    async editTask(@Param('id') taskId: number, @Body() taskEditDTO: TaskEditDTO): Promise<Task> {
         const taskToEdit: TaskEditDTO = {
             title: taskEditDTO.title, 
             description: taskEditDTO.description,
             isCompleted: taskEditDTO.isCompleted
             }
-        return this.taskService.editTask(taskId, taskToEdit);
+        return await this.taskService.editTask(taskId, taskToEdit);
     }
 
-    @Put('/archive/:taskId')
-    async toggleArchiveTask(@Param('taskId', ParseIntPipe) taskId: number): Promise<boolean> {
-        return this.taskService.toggleArchiveTask(taskId);
+    @Put('/complete/:id')
+    async toggleCompleteTask(@Param('id') taskId: number): Promise<Task> {
+        return await this.taskService.toggleCompleteTask(taskId);
+    }
+
+    @Put('/archive/:id')
+    async toggleArchiveTask(@Param('id', ParseIntPipe) taskId: number): Promise<Task> {
+        return await this.taskService.toggleArchiveTask(taskId);
     }
 
     @Delete('/delete/:id')
     async removeTaskPermanently(@Param('id') taskId: number): Promise<boolean> {        
-        return this.taskService.deleteTask(taskId);
+        return await this.taskService.deleteTask(taskId);
     }
 }

@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import { ApiGatewayTimeoutResponse } from '@nestjs/swagger';
 import { UserDTO } from 'src/DTOs/user.dto';
 import { UserEditDTO } from 'src/DTOs/user_edit.dto';
 import { UserPasswordDTO } from 'src/DTOs/user_password.dto';
@@ -30,11 +31,11 @@ export class UserController {
     async editUser(@Param('id') userId: number, @Body() userEditDTO: UserEditDTO
     ): Promise<UserEditDTO
     > {
-        return this.userService.editUser(userId, userEditDTO);
+        return await this.userService.editUser(userId, userEditDTO);
     }
 
     @Put('/password-change/:id')
     async changePassword(@Param('id') userId: number, @Body() userPasswordDTO: UserPasswordDTO): Promise<boolean> {
-        return this.userService.changePassword(userId, userPasswordDTO);
+        return await this.userService.changePassword(userId, userPasswordDTO);
     }
 }

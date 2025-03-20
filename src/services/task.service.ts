@@ -17,7 +17,7 @@ export class TasksService {
     ) {}
 
     async getAllTasks(): Promise<Task[]> {
-        return this.taskRepository.find();
+        return await this.taskRepository.find();
     }
 
     async getTaskById(taskId: number): Promise<Task> {
@@ -26,13 +26,17 @@ export class TasksService {
         return foundTask;
     }
 
-    async getUserTasks(userId: number): Promise<Task[]> {        
-        const foundTasks = await this.taskRepository.find({where: {user: {id: userId}}});
+    async getUserTasks(userId: number, archived: boolean): Promise<Task[]> {        
+        const foundTasks = await this.taskRepository.find({
+            where: {
+                user: {id: userId},
+                isArchived: archived
+            }});
         return foundTasks;
     }
 
     async createTask(taskDTO: TaskDTO): Promise<Task> {
-        const user = await this.userRepository.findOne({ where: { id: taskDTO.userId } });
+        const user = await this.userRepository.findOne({where: {id: taskDTO.userId}});
         if (!user) throw new Error('User not found');
         
         const createdTask = this.taskRepository.create({
@@ -40,7 +44,7 @@ export class TasksService {
             description: taskDTO.description,
             user: user
         });        
-        return this.taskRepository.save(createdTask);
+        return await this.taskRepository.save(createdTask);
     }
 
     async editTask(taskId: number, taskEditDTO: TaskEditDTO): Promise<Task> {
@@ -66,15 +70,26 @@ export class TasksService {
         return editedTask;
     }
 
-    async toggleArchiveTask(taskId: number): Promise<boolean> {
-        const foundTask: Task | null = await this.taskRepository.findOne({where: {id: taskId}});
-        if(!foundTask) throw new Error('Task not found');
+    async toggleCompleteTask(taskId: number): Promise<Task> {
+        let foundTask = await this.getTaskById(taskId);
 
-        const isArchived: boolean = !foundTask.isArchived
+        const isCompleted: boolean = !foundTask.isCompleted;
 
-        await this.taskRepository.update(taskId, {isArchived});
+        await this.taskRepository.update({id: taskId}, {isCompleted});
+        
+        foundTask = await this.getTaskById(taskId);
+        return foundTask;
+    }
 
-        return isArchived;
+    async toggleArchiveTask(taskId: number): Promise<Task> {
+        let foundTask: Task = await this.getTaskById(taskId);
+
+        const isArchived: boolean = !foundTask.isArchived;
+
+        await this.taskRepository.update({id: taskId}, {isArchived});
+
+        foundTask = await this.getTaskById(taskId);
+        return foundTask;
     }
 
     async deleteTask(taskId: number): Promise<boolean> {
