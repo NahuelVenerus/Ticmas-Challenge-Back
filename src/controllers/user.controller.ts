@@ -1,11 +1,13 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
 import { UserDTO } from 'src/DTOs/user.dto';
+import { UserEditDTO } from 'src/DTOs/user_edit.dto';
+import { UserPasswordDTO } from 'src/DTOs/user_password.dto';
 import { User } from 'src/entities/user.entity';
 import { UserService } from 'src/services/user.service';
 
 @Controller('users')
 export class UserController {
-    constructor(private readonly userService: UserService) {}
+    constructor(private readonly userService: UserService) { }
 
     @Get('/')
     async getAllUsers(): Promise<User[]> {
@@ -22,5 +24,17 @@ export class UserController {
         @Body() userDTO: UserDTO
     ): Promise<User> {
         return await this.userService.createUser(userDTO);
+    }
+
+    @Put('/edit/:id')
+    async editUser(@Param('id') userId: number, @Body() userEditDTO: UserEditDTO
+    ): Promise<UserEditDTO
+    > {
+        return this.userService.editUser(userId, userEditDTO);
+    }
+
+    @Put('/password-change/:id')
+    async changePassword(@Param('id') userId: number, @Body() userPasswordDTO: UserPasswordDTO): Promise<boolean> {
+        return this.userService.changePassword(userId, userPasswordDTO);
     }
 }
