@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { TaskDTO } from 'src/DTOs/task.dto';
 import { Task } from 'src/entities/task.entity';
 import { User } from 'src/entities/user.entity';
 import { Repository } from 'typeorm';
@@ -18,18 +19,13 @@ export class TasksService {
         return this.taskRepository.find();
     }
 
-    async createTask(title: string, description: string, userId: number): Promise<Task> {
-        const user = await this.userRepository.findOne({ where: { id: userId } });
+    async createTask(taskDTO: TaskDTO): Promise<Task> {
+        const user = await this.userRepository.findOne({ where: { id: taskDTO.userId } });
 
         if (!user) {
             throw new Error('User not found');
         }
-        const createdTask = this.taskRepository.create({
-            title,
-            description,
-            isCompleted: false,
-            user,
-        });
+        const createdTask = this.taskRepository.create(taskDTO);
         return this.taskRepository.save(createdTask);
     }
 }
