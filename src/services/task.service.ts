@@ -35,7 +35,11 @@ export class TasksService {
         const user = await this.userRepository.findOne({ where: { id: taskDTO.userId } });
         if (!user) throw new Error('User not found');
         
-        const createdTask = this.taskRepository.create(taskDTO);        
+        const createdTask = this.taskRepository.create({
+            title: taskDTO.title,
+            description: taskDTO.description,
+            user: user
+        });        
         return this.taskRepository.save(createdTask);
     }
 
