@@ -62,12 +62,23 @@ export class TasksService {
         return editedTask;
     }
 
-    async deleteTask(taskId: number): Promise<boolean> {
+    async toggleArchiveTask(taskId: number): Promise<boolean> {
+        const foundTask: Task | null = await this.taskRepository.findOne({where: {id: taskId}});
+        if(!foundTask) throw new Error('Task not found');
 
+        const isArchived: boolean = !foundTask.isArchived
+
+        await this.taskRepository.update(taskId, {isArchived});
+
+        return isArchived;
+    }
+
+    async deleteTask(taskId: number): Promise<boolean> {
         const taskToDelete: Task | null = await this.taskRepository.findOne({where: {id: taskId}});
         if(!taskToDelete) return false;
 
-        const deleteResult: DeleteResult = await this.taskRepository.delete({id: taskId});        
-        return deleteResult.raw;
+        const deleteResult: DeleteResult = await this.taskRepository.delete({id: taskId});     
+        
+        return (deleteResult.affected ?? 0) > 0;
     }
 }

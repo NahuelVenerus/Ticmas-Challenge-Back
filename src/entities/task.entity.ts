@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { User } from "./user.entity";
 
 @Entity()
@@ -15,10 +15,13 @@ export class Task {
     @Column({default: false})
     isCompleted: boolean;
 
+    @Column({default: false})
+    isArchived: boolean;
+
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     createdAt: Date;
 
-    @Column({ type: 'timestamp', nullable: true })
+    @UpdateDateColumn({ type: 'timestamp', nullable: true })
     updatedAt: Date;
 
     @ManyToOne(() => User, (user) => user.tasks)
