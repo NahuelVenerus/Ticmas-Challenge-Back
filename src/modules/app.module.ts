@@ -25,7 +25,7 @@ dotenv.config();
     }),
     TaskModule,
     UserModule,
-    AuthModule
+    AuthModule,
   ],
   providers: [
     {
