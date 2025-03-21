@@ -23,6 +23,12 @@ export class UserService {
       return foundUser;
    }
 
+   async getUserByEmail(email: string): Promise<User> {
+      const foundUser: User | null = await this.userRepository.findOne({where: { email }});
+      if(!foundUser) throw new Error('User not found');
+      return foundUser;
+   }
+
    async createUser(userDTO: UserDTO): Promise<User> {
       const existingUser = await this.userRepository.findOne({ where: { email: userDTO.email } });
 
