@@ -1,15 +1,5 @@
-import {
-  Body,
-  Controller,
-  Get,
-  InternalServerErrorException,
-  NotFoundException,
-  Param,
-  Post,
-  Put,
-  UseGuards,
-} from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import {Body, Controller, Get, InternalServerErrorException, NotFoundException, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { UserDTO } from 'src/DTOs/user.dto';
 import { UserEditDTO } from 'src/DTOs/user_edit.dto';
 import { UserLoginDTO } from 'src/DTOs/user_login_dto';
@@ -24,53 +14,75 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get('/')
+  @ApiOperation({ summary: 'Get all users', description: 'Retrieve a list of all registered users.' })
+  @ApiResponse({ status: 200, description: 'Users retrieved successfully.' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
   async getAllUsers() {
     try {
       return await this.userService.getAllUsers();
     } catch (error) {
-      throw new InternalServerErrorException(error, "Couldn't get users");
+      throw new InternalServerErrorException("Couldn't get users: " + error.message);
     }
   }
 
   @Get('/:userId')
+  @ApiOperation({ summary: 'Get user by ID', description: 'Retrieve a specific user by their ID.' })
+  @ApiResponse({ status: 200, description: 'User retrieved successfully.' })
+  @ApiResponse({ status: 404, description: 'User not found.' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
   async getUserById(@Param('userId') userId: number) {
     try {
       return await this.userService.getUserById(userId);
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
-      throw new InternalServerErrorException(error, 'Error getting user');
+      throw new InternalServerErrorException('Error getting user: ' + error.message);
     }
   }
 
   @Get('/email/:email')
+  @ApiOperation({ summary: 'Get user by email', description: 'Retrieve a specific user by their email.' })
+  @ApiResponse({ status: 200, description: 'User retrieved successfully.' })
+  @ApiResponse({ status: 404, description: 'User not found.' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
   async getUserByEmail(@Param('email') email: string) {
     try {
       return await this.userService.getUserByEmail(email);
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
-      throw new InternalServerErrorException('Error getting user by email');
+      throw new InternalServerErrorException('Error getting user by email: ' + error.message);
     }
   }
 
   @Post('/create')
+  @ApiOperation({ summary: 'Create user', description: 'Create a new user with the provided data.' })
+  @ApiResponse({ status: 201, description: 'User created successfully.' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
   async createUser(@Body() userDTO: UserDTO) {
     try {
       return await this.userService.createUser(userDTO);
     } catch (error) {
-      throw new InternalServerErrorException(error, 'Failed to create user');
+      throw new InternalServerErrorException('Failed to create user: ' + error.message);
     }
   }
 
   @Post('/login')
+  @ApiOperation({ summary: 'User login', description: 'Authenticate a user with their credentials.' })
+  @ApiResponse({ status: 200, description: 'User logged in successfully.' })
+  @ApiResponse({ status: 401, description: 'Invalid credentials.' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
   async userLogin(@Body() userLoginDTO: UserLoginDTO) {
     try {
       return await this.userService.loginUser(userLoginDTO);
     } catch (error) {
-      throw new InternalServerErrorException(error, 'Failed to login');
+      throw new InternalServerErrorException('Failed to login: ' + error.message);
     }
   }
 
   @Put('/edit/:id')
+  @ApiOperation({ summary: 'Edit user', description: 'Update the details of an existing user.' })
+  @ApiResponse({ status: 200, description: 'User updated successfully.' })
+  @ApiResponse({ status: 404, description: 'User not found.' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
   async editUser(
     @Param('id') userId: number,
     @Body() userEditDTO: UserEditDTO,
@@ -78,11 +90,15 @@ export class UserController {
     try {
       return await this.userService.editUser(userId, userEditDTO);
     } catch (error) {
-      throw new InternalServerErrorException(error, 'Failed to edit user');
+      throw new InternalServerErrorException('Failed to edit user: ' + error.message);
     }
   }
 
   @Put('/password-change/:id')
+  @ApiOperation({ summary: 'Change password', description: 'Update the password of an existing user.' })
+  @ApiResponse({ status: 200, description: 'Password changed successfully.' })
+  @ApiResponse({ status: 404, description: 'User not found.' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
   async changePassword(
     @Param('id') userId: number,
     @Body() userPasswordDTO: UserPasswordDTO,
@@ -90,10 +106,7 @@ export class UserController {
     try {
       return await this.userService.changePassword(userId, userPasswordDTO);
     } catch (error) {
-      throw new InternalServerErrorException(
-        error,
-        'Failed to change password',
-      );
+      throw new InternalServerErrorException('Failed to change password', error.message);
     }
   }
 }
