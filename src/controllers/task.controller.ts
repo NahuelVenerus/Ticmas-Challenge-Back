@@ -1,67 +1,58 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UseGuards, Query } from '@nestjs/common';
-import { JwtAuthGuard } from 'src/auth/jwt-auth-guard';
 import { TaskDTO } from 'src/DTOs/task.dto';
 import { TaskEditDTO } from 'src/DTOs/task_edit.dto';
-import { Task } from 'src/entities/task.entity';
+import { AuthGuard } from 'src/guards/auth.guard';
 import { TasksService } from 'src/services/task.service';
 
 @Controller('tasks')
+@UseGuards(AuthGuard)
 export class TasksController {
-    constructor(private readonly taskService: TasksService) {}    
+    constructor(private readonly taskService: TasksService) { }
 
-    @UseGuards(JwtAuthGuard)
     @Get('/')
-    async getAllTasks(): Promise<Task[]> {
-        return await this.taskService.getAllTasks();
+    getAllTasks() {
+        return this.taskService.getAllTasks();
     }
 
-    @UseGuards(JwtAuthGuard)
-    @Get('/:taskId') 
-    async getTaskById(@Param('taskId') taskId: number): Promise<Task> {
-        return await this.taskService.getTaskById(taskId);
+    @Get('/:id')
+    getTaskById(@Param('id') taskId: number) {
+        return this.taskService.getTaskById(taskId);
     }
 
-    @UseGuards(JwtAuthGuard)
     @Get('/user/:userId')
-    async getUserTasks(
-        @Param('userId') userId: number, 
-        @Query('archived') archived: boolean): Promise<Task[]> {
-        return await this.taskService.getUserTasks(userId, archived);
+    getUserTasks(
+        @Param('userId') userId: number,
+        @Query('archived') archived: boolean) {
+        return this.taskService.getUserTasks(userId, archived);
     }
 
-    @UseGuards(JwtAuthGuard)
     @Post('/create')
-    async createTask(
-        @Body() taskDTO: TaskDTO
-    ): Promise<Task> {
-        return await this.taskService.createTask(taskDTO);
+    createTask(@Body() taskDTO: TaskDTO) {
+        return this.taskService.createTask(taskDTO);
     }
 
-    @UseGuards(JwtAuthGuard)
     @Put('/edit/:taskId')
-    async editTask(@Param('id') taskId: number, @Body() taskEditDTO: TaskEditDTO): Promise<Task> {
+    editTask(@Param('id') taskId: number, @Body() taskEditDTO: TaskEditDTO) {
         const taskToEdit: TaskEditDTO = {
-            title: taskEditDTO.title, 
+            title: taskEditDTO.title,
             description: taskEditDTO.description,
             isCompleted: taskEditDTO.isCompleted
-            }
-        return await this.taskService.editTask(taskId, taskToEdit);
+        }
+        return this.taskService.editTask(taskId, taskToEdit);
     }
 
-    @UseGuards(JwtAuthGuard)
     @Put('/complete/:id')
-    async toggleCompleteTask(@Param('id') taskId: number): Promise<Task> {
-        return await this.taskService.toggleCompleteTask(taskId);
+    toggleCompleteTask(@Param('id') taskId: number) {
+        return this.taskService.toggleCompleteTask(taskId);
     }
 
     @Put('/archive/:id')
-    async toggleArchiveTask(@Param('id', ParseIntPipe) taskId: number): Promise<Task> {
-        return await this.taskService.toggleArchiveTask(taskId);
+    toggleArchiveTask(@Param('id', ParseIntPipe) taskId: number) {
+        return this.taskService.toggleArchiveTask(taskId);
     }
 
-    @UseGuards(JwtAuthGuard)
     @Delete('/delete/:id')
-    async removeTaskPermanently(@Param('id') taskId: number): Promise<boolean> {        
-        return await this.taskService.deleteTask(taskId);
+    removeTaskPermanently(@Param('id') taskId: number) {
+        return this.taskService.deleteTask(taskId);
     }
 }

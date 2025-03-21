@@ -1,11 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { User } from 'src/entities/user.entity';
 import { Repository, UpdateResult } from 'typeorm';
-import * as bcrypt from 'bcrypt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserDTO } from 'src/DTOs/user.dto';
 import { UserEditDTO } from 'src/DTOs/user_edit.dto';
 import { UserPasswordDTO } from 'src/DTOs/user_password.dto';
+import { UserLoginDTO } from 'src/DTOs/user_login_dto';
+import * as bcrypt from 'bcrypt';
+import * as jwt from 'jsonwebtoken';
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 @Injectable()
 export class UserService {
@@ -19,7 +23,7 @@ export class UserService {
 
    async getUserById(userId: number): Promise<User> {
       const foundUser = await this.userRepository.findOne({ where: { id: userId } });
-      if (!foundUser) throw new Error('User not found');
+      if (!foundUser) throw new NotFoundException('User not found');
       return foundUser;
    }
 
@@ -40,6 +44,23 @@ export class UserService {
 
       const createdUser = this.userRepository.create({ ...userDTO, password: hashedPassword });
       return await this.userRepository.save(createdUser);
+   }
+
+   async loginUser(userLoginDTO: UserLoginDTO): Promise<string> {
+
+      const jwtSecret: string | undefined = process.env.JWT_SECRET;
+      if(!jwtSecret) throw new InternalServerErrorException('JWT SECRET not defined in environment variables');
+
+      const foundUser: User = await this.getUserByEmail(userLoginDTO.email);
+      if(!foundUser) throw new NotFoundException('Wrong credentials');
+
+      const isPasswordValid: boolean = bcrypt.compare(userLoginDTO.password, foundUser.password);
+      if(!isPasswordValid) throw new UnauthorizedException('Wrong credentials');
+
+      const payload = { userId: foundUser.id, email: foundUser.email };
+      const token = jwt.sign(payload, jwtSecret, {expiresIn: '1hr'})
+
+      return token;
    }
 
    async editUser(userId: number, userEditDTO: UserEditDTO): Promise<UserEditDTO> {

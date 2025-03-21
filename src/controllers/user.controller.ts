@@ -1,54 +1,77 @@
-import { Body, Controller, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
-import { ApiGatewayTimeoutResponse } from '@nestjs/swagger';
-import { JwtAuthGuard } from 'src/auth/jwt-auth-guard';
-import { ApiGatewayTimeoutResponse } from '@nestjs/swagger';
+import { Body, Controller, Get, InternalServerErrorException, NotFoundException, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { UserDTO } from 'src/DTOs/user.dto';
 import { UserEditDTO } from 'src/DTOs/user_edit.dto';
+import { UserLoginDTO } from 'src/DTOs/user_login_dto';
 import { UserPasswordDTO } from 'src/DTOs/user_password.dto';
-import { User } from 'src/entities/user.entity';
+import { AuthGuard } from 'src/guards/auth.guard';
 import { UserService } from 'src/services/user.service';
 
 @Controller('users')
+@UseGuards(AuthGuard)
 export class UserController {
     constructor(private readonly userService: UserService) { }
 
-    @UseGuards(JwtAuthGuard)
     @Get('/')
-    async getAllUsers(): Promise<User[]> {
-        return await this.userService.getAllUsers();
+    getAllUsers() {
+        try {
+            return this.userService.getAllUsers();
+        } catch (error) {
+            throw new InternalServerErrorException("Couldn't get users");
+        }
     }
 
-    @UseGuards(JwtAuthGuard)
     @Get('/:userId')
-    async getUserById(@Param('userId') userId: number): Promise<User> {
-        return await this.userService.getUserById(userId);
+    getUserById(@Param('userId') userId: number) {
+        try {
+            return this.userService.getUserById(userId);
+        } catch (error) {
+            if (error instanceof NotFoundException) throw error;
+            throw new InternalServerErrorException('Error getting user')
+        }
     }
 
-    @UseGuards(JwtAuthGuard)
-    @Get('/:email')
-    async getUserByEmail(@Param('email') email: string): Promise<User> {
-        return await this.userService.getUserByEmail(email);
+    @Get('/email/:email')
+    getUserByEmail(@Param('email') email: string) {
+        try {
+            return this.userService.getUserByEmail(email);
+        } catch (error) {
+            throw new Error('Usuario no encontrado');
+        }
     }
 
-    @UseGuards(JwtAuthGuard)
     @Post('/create')
-    async createUser(
-        @Body() userDTO: UserDTO
-    ): Promise<User> {
-        return await this.userService.createUser(userDTO);
+    createUser(@Body() userDTO: UserDTO) {
+        try {
+            return this.userService.createUser(userDTO);
+        } catch (error) {
+            throw new Error('No se pudo crear el usuario');
+        }
+    }
+    
+    @Post('/login')
+    userLogin(@Body() userLoginDTO: UserLoginDTO) {
+        try {
+            return this.userService.loginUser(userLoginDTO);
+        } catch (error) {
+            throw new Error('No se pudo crear el usuario');
+        }
     }
 
-    @UseGuards(JwtAuthGuard)
     @Put('/edit/:id')
-    async editUser(@Param('id') userId: number, @Body() userEditDTO: UserEditDTO
-    ): Promise<UserEditDTO
-    > {
-        return await this.userService.editUser(userId, userEditDTO);
+    editUser(@Param('id') userId: number, @Body() userEditDTO: UserEditDTO) {
+        try {
+            return this.userService.editUser(userId, userEditDTO);
+        } catch (error) {
+            throw new Error('No se pudo editar el usuario');
+        }
     }
 
-    @UseGuards(JwtAuthGuard)
     @Put('/password-change/:id')
-    async changePassword(@Param('id') userId: number, @Body() userPasswordDTO: UserPasswordDTO): Promise<boolean> {
-        return await this.userService.changePassword(userId, userPasswordDTO);
+    changePassword(@Param('id') userId: number, @Body() userPasswordDTO: UserPasswordDTO) {
+        try {
+            return this.userService.changePassword(userId, userPasswordDTO);
+        } catch (error) {
+            throw new Error('No se pudo cambiar la contraseña');
+        }
     }
 }
