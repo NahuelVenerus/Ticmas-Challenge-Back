@@ -28,7 +28,7 @@ export class UserService {
     try {
       return await this.userRepository.find();
     } catch (error) {
-      throw new InternalServerErrorException("Couldn't retrieve users");
+      throw new InternalServerErrorException(error, "Couldn't retrieve users");
     }
   }
 
@@ -64,7 +64,7 @@ export class UserService {
       });
       return await this.userRepository.save(createdUser);
     } catch (error) {
-      throw new InternalServerErrorException('Failed to create user');
+      throw new InternalServerErrorException(error, 'Failed to create user');
     }
   }
 
@@ -94,8 +94,7 @@ export class UserService {
     userId: number,
     userEditDTO: UserEditDTO,
   ): Promise<UserEditDTO> {
-    const foundUser: User = await this.getUserById(userId);
-
+    await this.getUserById(userId);
     const updateResult: UpdateResult = await this.userRepository.update(
       { id: userId },
       userEditDTO,
@@ -136,7 +135,10 @@ export class UserService {
       foundUser.password = await bcrypt.hash(userPasswordDTO.newPassword, 10);
       await this.userRepository.save(foundUser);
     } catch (error) {
-      throw new InternalServerErrorException('Failed to change password');
+      throw new InternalServerErrorException(
+        error,
+        'Failed to change password',
+      );
     }
 
     return true;

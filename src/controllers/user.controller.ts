@@ -28,7 +28,7 @@ export class UserController {
     try {
       return await this.userService.getAllUsers();
     } catch (error) {
-      throw new InternalServerErrorException("Couldn't get users");
+      throw new InternalServerErrorException(error, "Couldn't get users");
     }
   }
 
@@ -38,7 +38,7 @@ export class UserController {
       return await this.userService.getUserById(userId);
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
-      throw new InternalServerErrorException('Error getting user');
+      throw new InternalServerErrorException(error, 'Error getting user');
     }
   }
 
@@ -57,7 +57,7 @@ export class UserController {
     try {
       return await this.userService.createUser(userDTO);
     } catch (error) {
-      throw new InternalServerErrorException('Failed to create user');
+      throw new InternalServerErrorException(error, 'Failed to create user');
     }
   }
 
@@ -66,7 +66,7 @@ export class UserController {
     try {
       return await this.userService.loginUser(userLoginDTO);
     } catch (error) {
-      throw new InternalServerErrorException('Failed to login');
+      throw new InternalServerErrorException(error, 'Failed to login');
     }
   }
 
@@ -78,7 +78,7 @@ export class UserController {
     try {
       return await this.userService.editUser(userId, userEditDTO);
     } catch (error) {
-      throw new InternalServerErrorException('Failed to edit user');
+      throw new InternalServerErrorException(error, 'Failed to edit user');
     }
   }
 
@@ -90,7 +90,10 @@ export class UserController {
     try {
       return await this.userService.changePassword(userId, userPasswordDTO);
     } catch (error) {
-      throw new InternalServerErrorException('Failed to change password');
+      throw new InternalServerErrorException(
+        error,
+        'Failed to change password',
+      );
     }
   }
 }

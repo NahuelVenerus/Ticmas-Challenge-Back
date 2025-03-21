@@ -15,23 +15,23 @@ export class AuthService {
     private UserRepository: Repository<User>,
   ) {}
 
-  async verifyToken(token: string): Promise<boolean> {
+  verifyToken(token: string): boolean {
     const jwtSecret: string | undefined = process.env.JWT_SECRET;
+    if (!jwtSecret)
+      throw new InternalServerErrorException(
+        'JWT_SECRET not found in environment variables',
+      );
     try {
-      if (!jwtSecret)
-        throw new InternalServerErrorException(
-          'JWT_SECRET not found in environment variables',
-        );
-      jwt.verify(token, jwtSecret);
-      return true;
-    } catch (error) {
-      if (error instanceof jwt.TokenExpiredError) {
-        throw new UnauthorizedException('Token has expired');
-      }
-      if (error instanceof jwt.JsonWebTokenError) {
-        throw new UnauthorizedException('Invalid token');
-      }
+      jwt.verify(token, jwtSecret) as jwt.Jwt;
+    } catch (error: unknown) {
+      if (error instanceof jwt.TokenExpiredError)
+        throw new UnauthorizedException(error, 'Token has expired');
+      if (error instanceof jwt.JsonWebTokenError)
+        throw new UnauthorizedException(error, 'Invalid token');
+      if (error instanceof Error)
+        throw new UnauthorizedException(error.message, "User isn't authorized");
       throw new UnauthorizedException("User isn't authorized");
     }
+    return true;
   }
 }
