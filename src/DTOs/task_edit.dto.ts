@@ -10,8 +10,4 @@ export class TaskEditDTO {
     @IsOptional()
     @MaxLength(200, { message: 'The description must not exceed 200 characters' })
     description?: string;
-
-    @IsBoolean()
-    @IsOptional()
-    isCompleted?: boolean;
 }

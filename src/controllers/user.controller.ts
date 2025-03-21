@@ -12,66 +12,67 @@ export class UserController {
     constructor(private readonly userService: UserService) { }
 
     @Get('/')
-    getAllUsers() {
+    async getAllUsers() {
         try {
-            return this.userService.getAllUsers();
+            return await this.userService.getAllUsers();
         } catch (error) {
             throw new InternalServerErrorException("Couldn't get users");
         }
     }
 
     @Get('/:userId')
-    getUserById(@Param('userId') userId: number) {
+    async getUserById(@Param('userId') userId: number) {
         try {
-            return this.userService.getUserById(userId);
+            return await this.userService.getUserById(userId);
         } catch (error) {
             if (error instanceof NotFoundException) throw error;
-            throw new InternalServerErrorException('Error getting user')
+            throw new InternalServerErrorException('Error getting user');
         }
     }
 
     @Get('/email/:email')
-    getUserByEmail(@Param('email') email: string) {
+    async getUserByEmail(@Param('email') email: string) {
         try {
-            return this.userService.getUserByEmail(email);
+            return await this.userService.getUserByEmail(email);
         } catch (error) {
-            throw new Error('Usuario no encontrado');
+            if (error instanceof NotFoundException) throw error;
+            throw new InternalServerErrorException('Error getting user by email');
         }
     }
 
     @Post('/create')
-    createUser(@Body() userDTO: UserDTO) {
+    async createUser(@Body() userDTO: UserDTO) {
         try {
-            return this.userService.createUser(userDTO);
+            return await this.userService.createUser(userDTO);
         } catch (error) {
-            throw new Error('No se pudo crear el usuario');
+            throw new InternalServerErrorException('Failed to create user');
         }
     }
     
     @Post('/login')
-    userLogin(@Body() userLoginDTO: UserLoginDTO) {
+    async userLogin(@Body() userLoginDTO: UserLoginDTO) {
         try {
-            return this.userService.loginUser(userLoginDTO);
+            return await this.userService.loginUser(userLoginDTO);
         } catch (error) {
-            throw new Error('No se pudo crear el usuario');
+            throw new InternalServerErrorException('Failed to login');
         }
     }
 
     @Put('/edit/:id')
-    editUser(@Param('id') userId: number, @Body() userEditDTO: UserEditDTO) {
+    async editUser(@Param('id') userId: number, @Body() userEditDTO: UserEditDTO) {
         try {
-            return this.userService.editUser(userId, userEditDTO);
+            return await this.userService.editUser(userId, userEditDTO);
         } catch (error) {
-            throw new Error('No se pudo editar el usuario');
+            throw new InternalServerErrorException('Failed to edit user');
         }
     }
 
     @Put('/password-change/:id')
-    changePassword(@Param('id') userId: number, @Body() userPasswordDTO: UserPasswordDTO) {
+    async changePassword(@Param('id') userId: number, @Body() userPasswordDTO: UserPasswordDTO) {
         try {
-            return this.userService.changePassword(userId, userPasswordDTO);
+            return await this.userService.changePassword(userId, userPasswordDTO);
         } catch (error) {
-            throw new Error('No se pudo cambiar la contraseña');
+            throw new InternalServerErrorException('Failed to change password');
         }
     }
 }

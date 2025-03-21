@@ -31,12 +31,11 @@ export class TasksController {
         return this.taskService.createTask(taskDTO);
     }
 
-    @Put('/edit/:taskId')
+    @Put('/edit/:id')
     editTask(@Param('id') taskId: number, @Body() taskEditDTO: TaskEditDTO) {
         const taskToEdit: TaskEditDTO = {
             title: taskEditDTO.title,
-            description: taskEditDTO.description,
-            isCompleted: taskEditDTO.isCompleted
+            description: taskEditDTO.description
         }
         return this.taskService.editTask(taskId, taskToEdit);
     }
