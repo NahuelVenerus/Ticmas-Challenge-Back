@@ -41,7 +41,7 @@ export class TasksService {
     });
   }
 
-  async createTask(taskDTO: TaskDTO): Promise<Task> {
+  async createTask(taskDTO: TaskDTO): Promise<TaskDTO> {
     const user = await this.userRepository.findOne({
       where: { id: taskDTO.userId },
     });
@@ -52,7 +52,8 @@ export class TasksService {
       description: taskDTO.description,
       user: user,
     });
-    return await this.taskRepository.save(createdTask);
+    await this.taskRepository.save(createdTask);
+    return { title: createdTask.title, description: createdTask.description, id: user.id } as TaskDTO;
   }
 
   async editTask(taskId: number, taskEditDTO: TaskEditDTO): Promise<Task> {
