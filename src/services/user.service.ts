@@ -49,7 +49,7 @@ export class UserService {
   }
 
   async createUser(userDTO: UserDTO): Promise<User> {
-    const existingUser = await this.userRepository.findOne({
+    const existingUser: User | null = await this.userRepository.findOne({
       where: { email: userDTO.email },
     });
     if (existingUser) {
@@ -57,13 +57,13 @@ export class UserService {
     }
 
     try {
-      const hashedPassword = await bcrypt.hash(userDTO.password, 10);
+      const hashedPassword: string = await bcrypt.hash(userDTO.password, 10);
       const createdUser = this.userRepository.create({
         ...userDTO,
         password: hashedPassword,
       });
       return await this.userRepository.save(createdUser);
-    } catch (error) {
+    } catch (error: unknown) {
       throw new InternalServerErrorException(error, 'Failed to create user');
     }
   }
