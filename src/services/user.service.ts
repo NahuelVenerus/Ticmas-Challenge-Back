@@ -57,7 +57,11 @@ export class UserService {
     }
 
     try {
-      const hashedPassword: string = await bcrypt.hash(userDTO.password, 10);
+      const userPassword = userDTO?.password;
+      if (!userPassword)
+        throw new BadRequestException('User data not received');
+      const hashedPassword = await bcrypt.hash(userPassword, 10);
+
       const createdUser = this.userRepository.create({
         ...userDTO,
         password: hashedPassword,
@@ -74,10 +78,12 @@ export class UserService {
       throw new InternalServerErrorException(
         'JWT SECRET not defined in environment variables',
       );
-
+    if (!userLoginDTO.email)
+      throw new BadRequestException('User data not received');
     const foundUser: User = await this.getUserByEmail(userLoginDTO.email);
     if (!foundUser) throw new NotFoundException('Wrong credentials');
-
+    if (!userLoginDTO.password || !foundUser.password)
+      throw new BadRequestException('User data not received');
     const isPasswordValid: boolean = await bcrypt.compare(
       userLoginDTO.password,
       foundUser.password,
@@ -119,7 +125,12 @@ export class UserService {
     userPasswordDTO: UserPasswordDTO,
   ): Promise<boolean> {
     const foundUser: User = await this.getUserById(userId);
-
+    if (
+      !userPasswordDTO.currentPassword ||
+      !userPasswordDTO.newPassword ||
+      !foundUser.password
+    )
+      throw new BadRequestException('User data not received');
     const isCurrentPasswordValid: boolean = await bcrypt.compare(
       userPasswordDTO.currentPassword,
       foundUser.password,

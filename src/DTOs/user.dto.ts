@@ -14,7 +14,7 @@ export class UserDTO {
   })
   @IsString()
   @IsNotEmpty()
-  name: string;
+  name?: string;
 
   @ApiProperty({
     example: 'Doe',
@@ -22,7 +22,7 @@ export class UserDTO {
   })
   @IsString()
   @IsNotEmpty()
-  lastname: string;
+  lastname?: string;
 
   @ApiProperty({
     example: 'john.doe@example.com',
@@ -31,7 +31,7 @@ export class UserDTO {
   @IsString()
   @IsNotEmpty()
   @IsEmail({}, { message: 'Email is invalid' })
-  email: string;
+  email?: string;
 
   @ApiProperty({
     example: 'Password123!',
@@ -52,5 +52,5 @@ export class UserDTO {
     message:
       'The password must contain at least one special character (@, $, !, %, *, ?, &, .)',
   })
-  password: string;
+  password?: string;
 }

@@ -21,7 +21,7 @@ export class UserPasswordDTO {
     message:
       'The password must contain at least one special character (@, $, !, %, *, ?, &, .)',
   })
-  currentPassword: string;
+  currentPassword?: string;
 
   @ApiProperty({
     example: 'NewPassword123!',
@@ -41,5 +41,5 @@ export class UserPasswordDTO {
     message:
       'The password must contain at least one special character (@, $, !, %, *, ?, &, .)',
   })
-  newPassword: string;
+  newPassword?: string;
 }

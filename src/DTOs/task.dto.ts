@@ -17,7 +17,7 @@ export class TaskDTO {
   @IsString()
   @IsNotEmpty()
   @MaxLength(30, { message: 'The title must not exceed 30 characters' })
-  title: string;
+  title?: string;
 
   @ApiProperty({
     example: 'Use dish soap and scrub',
@@ -27,7 +27,7 @@ export class TaskDTO {
   @IsString()
   @IsNotEmpty()
   @MaxLength(200, { message: 'The description must not exceed 200 characters' })
-  description: string;
+  description?: string;
 
   @ApiProperty({
     example: false,
@@ -44,5 +44,5 @@ export class TaskDTO {
   })
   @IsInt()
   @IsNotEmpty()
-  userId: number;
+  userId?: number;
 }

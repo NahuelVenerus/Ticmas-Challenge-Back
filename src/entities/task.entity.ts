@@ -11,27 +11,27 @@ import { User } from './user.entity';
 @Entity('tasks')
 export class Task {
   @PrimaryGeneratedColumn()
-  id: number;
+  id?: number;
 
   @Column()
-  title: string;
+  title?: string;
 
   @Column()
-  description: string;
+  description?: string;
 
   @Column({ default: false })
-  isCompleted: boolean;
+  isCompleted?: boolean;
 
   @Column({ default: false })
-  isArchived: boolean;
+  isArchived?: boolean;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  createdAt: Date;
+  createdAt?: Date;
 
   @UpdateDateColumn({ type: 'timestamp', nullable: true })
-  updatedAt: Date;
+  updatedAt?: Date;
 
   @ManyToOne(() => User, (user) => user.tasks)
   @JoinColumn({ name: 'userId' })
-  user: User;
+  user?: User;
 }
