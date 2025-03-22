@@ -8,7 +8,7 @@ import { TaskService } from 'src/services/task.service';
 @ApiTags('Tasks')
 @Controller('tasks')
 @UseGuards(AuthGuard)
-export class TasksController {
+export class TaskController {
   constructor(private readonly taskService: TaskService) {}
 
   @Get('/')
