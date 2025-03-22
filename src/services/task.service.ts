@@ -92,12 +92,15 @@ export class TaskService {
   }
 
   async deleteTask(taskId: number): Promise<boolean> {
-    await this.getTaskById(taskId);
-    const deleteResult: DeleteResult = await this.taskRepository.delete({
-      id: taskId,
-    });
-    if (!deleteResult.affected)
-      throw new InternalServerErrorException('Task deletion failed');
-    return true;
+    try {
+      await this.getTaskById(taskId);
+      const deleteResult: DeleteResult = await this.taskRepository.delete({id: taskId});
+      if (!deleteResult.affected) throw new NotFoundException('Task not found');
+
+      return true;      
+    } catch (error) {
+      if (error instanceof NotFoundException) throw error;
+      throw new InternalServerErrorException('Failed to delete Task')
+    }
   }
 }

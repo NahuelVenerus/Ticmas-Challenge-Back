@@ -111,19 +111,14 @@ export class UserController {
   }
 
   @Delete('/delete/:id')
-  @ApiOperation({ summary: 'Delete user', description: 'Delete an existing user.' })
-  @ApiResponse({ status: 200, description: 'User deleted successfully.' })
-  @ApiResponse({ status: 404, description: 'User not found.' })
-  @ApiResponse({ status: 500, description: 'Internal server error' })
-  deleteUser(@Param('id') userId: number) {
+  @ApiOperation({ summary: 'Delete task', description: 'Permanently remove a task from the system.' })
+  @ApiResponse({ status: 200, description: 'Task deleted successfully.' })
+  @ApiResponse({ status: 404, description: 'Task not found.' })
+  async removeTaskPermanently(@Param('id') taskId: number) {
     try {
-      const result = this.userService.deleteUser(userId);
-      if (!result) {
-        throw new NotFoundException(`User with ID ${userId} not found`);
-      }
-      return { message: 'User deleted successfully' };
+      return await this.userService.deleteUser(taskId);
     } catch (error) {
-      throw new InternalServerErrorException('Failed to delete user', error.message);
+      throw new InternalServerErrorException('Error deleting task: ' + error.message);
     }
   }
 }

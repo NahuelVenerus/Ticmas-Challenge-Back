@@ -4,7 +4,7 @@ import { User } from 'src/entities/user.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { BadRequestException, NotFoundException, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { Repository } from 'typeorm';
+import { DeleteResult, Repository } from 'typeorm';
 import { UserLoginDTO } from 'src/DTOs/user_login_dto';
 
 describe('UserService', () => {
@@ -19,6 +19,7 @@ describe('UserService', () => {
       create: jest.fn(),
       save: jest.fn(),
       update: jest.fn(),
+      delete: jest.fn()
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -36,7 +37,7 @@ describe('UserService', () => {
 
   afterEach(() => {
     delete process.env.JWT_SECRET;
-})
+  })
 
   it('should be defined', () => {
     expect(service).toBeDefined();
@@ -136,9 +137,9 @@ describe('UserService', () => {
     it('should throw an error if JWT_SECRET is not defined', async () => {
       process.env.JWT_SECRET = undefined;
       delete process.env.JWT_SECRET;
-    
+
       const userLoginDTO: UserLoginDTO = { email: 'test@example.com', password: 'password123' };
-    
+
       await expect(service.loginUser(userLoginDTO)).rejects.toThrow(InternalServerErrorException);
     });
 
@@ -152,28 +153,28 @@ describe('UserService', () => {
     });
   });
 
-describe('editUser', () => {
-  it('should update and return user edit DTO', async () => {
-    const userEditDTO = { name: 'John', lastname: 'Doe', email: 'john.doe@example.com' };
-    const mockUser = { id: 1, ...userEditDTO };
-    const updatedUser = { ...userEditDTO };
+  describe('editUser', () => {
+    it('should update and return user edit DTO', async () => {
+      const userEditDTO = { name: 'John', lastname: 'Doe', email: 'john.doe@example.com' };
+      const mockUser = { id: 1, ...userEditDTO };
+      const updatedUser = { ...userEditDTO };
 
-    (mockUserRepository.findOne as jest.Mock).mockResolvedValue(mockUser);
-    (mockUserRepository.update as jest.Mock).mockResolvedValue({ affected: 1 });
-    (mockUserRepository.save as jest.Mock).mockResolvedValue(updatedUser);
+      (mockUserRepository.findOne as jest.Mock).mockResolvedValue(mockUser);
+      (mockUserRepository.update as jest.Mock).mockResolvedValue({ affected: 1 });
+      (mockUserRepository.save as jest.Mock).mockResolvedValue(updatedUser);
 
-    const result = await service.editUser(1, userEditDTO);
+      const result = await service.editUser(1, userEditDTO);
 
-    expect(result).toMatchObject(updatedUser);
+      expect(result).toMatchObject(updatedUser);
+    });
+
+    it('should throw an error if user update fails', async () => {
+      const userEditDTO = { name: 'John', lastname: 'Doe', email: 'john.doe@example.com' };
+      (mockUserRepository.findOne as jest.Mock).mockResolvedValue(null);
+
+      await expect(service.editUser(1, userEditDTO)).rejects.toThrowError(NotFoundException);
+    });
   });
-
-  it('should throw an error if user update fails', async () => {
-    const userEditDTO = { name: 'John', lastname: 'Doe', email: 'john.doe@example.com' };
-    (mockUserRepository.findOne as jest.Mock).mockResolvedValue(null);
-
-    await expect(service.editUser(1, userEditDTO)).rejects.toThrowError(NotFoundException);
-  });
-});
 
   describe('changePassword', () => {
     it('should change the password successfully', async () => {
@@ -206,4 +207,36 @@ describe('editUser', () => {
       await expect(service.changePassword(1, userPasswordDTO)).rejects.toThrowError(BadRequestException);
     });
   })
+
+  it('should delete a user successfully', async () => {
+    const userId = 1;
+    const deleteResult: DeleteResult = { affected: 1, raw: [] };
+  
+    (mockUserRepository.findOne as jest.Mock).mockResolvedValue({ id: userId });
+    (mockUserRepository.delete as jest.Mock).mockResolvedValue(deleteResult);
+  
+    const result = await service.deleteUser(userId);
+    expect(result).toBe(true);
+    expect(mockUserRepository.delete).toHaveBeenCalledWith({ id: userId });
+  });
+  
+  
+
+  it('should throw NotFoundException if no user is deleted', async () => {
+    const userId = 1;
+
+    (mockUserRepository.delete as jest.Mock).mockResolvedValue({ affected: 0, raw: [] });
+
+    await expect(service.deleteUser(userId)).rejects.toThrow(NotFoundException);
+    await expect(service.deleteUser(userId)).rejects.toThrow(`User not found`);
+  });
+  
+
+  it('should throw InternalServerErrorException on repository error', async () => {
+    (mockUserRepository.findOne as jest.Mock).mockResolvedValue({ id: 1, name: 'John Doe' });
+    (mockUserRepository.delete as jest.Mock).mockRejectedValue(new Error('Database error'));
+  
+    await expect(service.deleteUser(1)).rejects.toThrow(InternalServerErrorException);
+  });
+  
 });

@@ -22,7 +22,7 @@ export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-  ) {}
+  ) { }
 
   async getAllUsers(): Promise<User[]> {
     try {
@@ -52,24 +52,24 @@ export class UserService {
     const existingUser: User | null = await this.userRepository.findOne({
       where: { email: userDTO.email },
     });
-    
+
     if (existingUser) {
       throw new BadRequestException('User email already exists');
     }
-  
+
     try {
       const userPassword = userDTO?.password;
-      
+
       if (!userPassword) {
         throw new BadRequestException('User data not received');
       }
-      
+
       const hashedPassword = await bcrypt.hash(userPassword, 10);
       const createdUser = this.userRepository.create({
         ...userDTO,
         password: hashedPassword,
       });
-      
+
       return await this.userRepository.save(createdUser);
     } catch (error: unknown) {
       if (error instanceof BadRequestException) {
@@ -80,31 +80,31 @@ export class UserService {
   }
 
   async loginUser(userLoginDTO: UserLoginDTO): Promise<string> {
-    const jwtSecret: string | undefined = process.env.JWT_SECRET;    
+    const jwtSecret: string | undefined = process.env.JWT_SECRET;
     if (!jwtSecret) throw new InternalServerErrorException('JWT SECRET not defined in environment variables');
     if (!userLoginDTO.email) throw new BadRequestException('Email is required');
-  
+
     const foundUser: User = await this.getUserByEmail(userLoginDTO.email);
     if (!foundUser) {
       throw new NotFoundException('Wrong credentials');
     }
-  
+
     if (!userLoginDTO.password || !foundUser.password) {
       throw new BadRequestException('Password is required');
     }
-  
+
     const isPasswordValid: boolean = await bcrypt.compare(
       userLoginDTO.password,
       foundUser.password,
     );
-  
+
     if (!isPasswordValid) {
       throw new UnauthorizedException('Wrong credentials');
     }
-  
+
     const payload = { userId: foundUser.id, email: foundUser.email };
     const token = jwt.sign(payload, jwtSecret, { expiresIn: '1hr' });
-  
+
     return token;
   }
 
@@ -169,13 +169,14 @@ export class UserService {
 
   async deleteUser(userId: number): Promise<boolean> {
     try {
-      const response: DeleteResult = await this.userRepository.delete({ id: userId });
-      if (response.affected === 0) {
-        throw new NotFoundException(`User with ID ${userId} not found`);
-      }
-      return response.affected === 1;
+      await this.getUserById(userId);
+      const deleteResult: DeleteResult = await this.userRepository.delete({ id: userId });  
+      if (!deleteResult.affected) throw new NotFoundException('User not found');  
+
+      return true;
     } catch (error) {
-      throw new InternalServerErrorException('Failed to delete user', error.message);
+      if (error instanceof NotFoundException) throw error;
+      throw new InternalServerErrorException('Failed to delete user');
     }
-  }
+  }  
 }
