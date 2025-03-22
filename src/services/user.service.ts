@@ -52,47 +52,59 @@ export class UserService {
     const existingUser: User | null = await this.userRepository.findOne({
       where: { email: userDTO.email },
     });
+    
     if (existingUser) {
       throw new BadRequestException('User email already exists');
     }
-
+  
     try {
       const userPassword = userDTO?.password;
-      if (!userPassword)
+      
+      if (!userPassword) {
         throw new BadRequestException('User data not received');
+      }
+      
       const hashedPassword = await bcrypt.hash(userPassword, 10);
-
       const createdUser = this.userRepository.create({
         ...userDTO,
         password: hashedPassword,
       });
+      
       return await this.userRepository.save(createdUser);
     } catch (error: unknown) {
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
       throw new InternalServerErrorException(error, 'Failed to create user');
     }
   }
 
   async loginUser(userLoginDTO: UserLoginDTO): Promise<string> {
-    const jwtSecret: string | undefined = process.env.JWT_SECRET;
-    if (!jwtSecret)
-      throw new InternalServerErrorException(
-        'JWT SECRET not defined in environment variables',
-      );
-    if (!userLoginDTO.email)
-      throw new BadRequestException('User data not received');
+    const jwtSecret: string | undefined = process.env.JWT_SECRET;    
+    if (!jwtSecret) throw new InternalServerErrorException('JWT SECRET not defined in environment variables');
+    if (!userLoginDTO.email) throw new BadRequestException('Email is required');
+  
     const foundUser: User = await this.getUserByEmail(userLoginDTO.email);
-    if (!foundUser) throw new NotFoundException('Wrong credentials');
-    if (!userLoginDTO.password || !foundUser.password)
-      throw new BadRequestException('User data not received');
+    if (!foundUser) {
+      throw new NotFoundException('Wrong credentials');
+    }
+  
+    if (!userLoginDTO.password || !foundUser.password) {
+      throw new BadRequestException('Password is required');
+    }
+  
     const isPasswordValid: boolean = await bcrypt.compare(
       userLoginDTO.password,
       foundUser.password,
     );
-    if (!isPasswordValid) throw new UnauthorizedException('Wrong credentials');
-
+  
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Wrong credentials');
+    }
+  
     const payload = { userId: foundUser.id, email: foundUser.email };
     const token = jwt.sign(payload, jwtSecret, { expiresIn: '1hr' });
-
+  
     return token;
   }
 
@@ -110,7 +122,7 @@ export class UserService {
 
     const updatedUser: User = await this.getUserById(userId);
     if (!updatedUser)
-      throw new InternalServerErrorException('User not found after update');
+      throw new NotFoundException('User not found after update');
 
     const updatedUserEditDTO = new UserEditDTO();
     updatedUserEditDTO.name = updatedUser.name;
