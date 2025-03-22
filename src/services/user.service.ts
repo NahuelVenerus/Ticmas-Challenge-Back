@@ -6,7 +6,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { User } from 'src/entities/user.entity';
-import { Repository, UpdateResult } from 'typeorm';
+import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserDTO } from 'src/DTOs/user.dto';
 import { UserEditDTO } from 'src/DTOs/user_edit.dto';
@@ -165,5 +165,17 @@ export class UserService {
     }
 
     return true;
+  }
+
+  async deleteUser(userId: number): Promise<boolean> {
+    try {
+      const response: DeleteResult = await this.userRepository.delete({ id: userId });
+      if (response.affected === 0) {
+        throw new NotFoundException(`User with ID ${userId} not found`);
+      }
+      return response.affected === 1;
+    } catch (error) {
+      throw new InternalServerErrorException('Failed to delete user', error.message);
+    }
   }
 }
