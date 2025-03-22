@@ -3,13 +3,13 @@ import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { TaskDTO } from 'src/DTOs/task.dto';
 import { TaskEditDTO } from 'src/DTOs/task_edit.dto';
 import { AuthGuard } from 'src/guards/auth.guard';
-import { TasksService } from 'src/services/task.service';
+import { TaskService } from 'src/services/task.service';
 
 @ApiTags('Tasks')
 @Controller('tasks')
 @UseGuards(AuthGuard)
 export class TasksController {
-  constructor(private readonly taskService: TasksService) {}
+  constructor(private readonly taskService: TaskService) {}
 
   @Get('/')
   @ApiOperation({ summary: 'Get all tasks', description: 'Retrieve a list of all tasks.' })

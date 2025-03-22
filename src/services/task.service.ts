@@ -11,7 +11,7 @@ import { User } from 'src/entities/user.entity';
 import { DeleteResult, Repository } from 'typeorm';
 
 @Injectable()
-export class TasksService {
+export class TaskService {
   constructor(
     @InjectRepository(Task)
     private readonly taskRepository: Repository<Task>,
