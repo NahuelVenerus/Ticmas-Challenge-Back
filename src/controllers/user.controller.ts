@@ -1,15 +1,15 @@
 import { Body, Controller, Delete, Get, InternalServerErrorException, NotFoundException, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { UserDTO } from 'src/DTOs/user.dto';
 import { UserEditDTO } from 'src/DTOs/user_edit.dto';
 import { UserLoginDTO } from 'src/DTOs/user_login_dto';
 import { UserPasswordDTO } from 'src/DTOs/user_password.dto';
-import { AuthGuard } from 'src/guards/auth.guard';
 import { UserService } from 'src/services/user.service';
 
 @ApiTags('Users')
 @Controller('users')
-@UseGuards(AuthGuard)
+@UseGuards(AuthGuard('jwt'))
 export class UserController {
   constructor(private readonly userService: UserService) { }
 

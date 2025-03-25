@@ -1,13 +1,13 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UseGuards, Query, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { TaskDTO } from 'src/DTOs/task.dto';
 import { TaskEditDTO } from 'src/DTOs/task_edit.dto';
-import { AuthGuard } from 'src/guards/auth.guard';
 import { TaskService } from 'src/services/task.service';
 
 @ApiTags('Tasks')
 @Controller('tasks')
-@UseGuards(AuthGuard)
+@UseGuards(AuthGuard('jwt'))
 export class TaskController {
   constructor(private readonly taskService: TaskService) {}
 

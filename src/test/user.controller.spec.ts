@@ -1,8 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserController } from '../controllers/user.controller';
 import { UserService } from 'src/services/user.service';
-import { AuthGuard } from 'src/guards/auth.guard';
-import { AuthService } from 'src/guards/auth.service';
+import { AuthGuard } from '@nestjs/passport';
 
 describe('UserController', () => {
   let controller: UserController;
@@ -17,12 +16,8 @@ describe('UserController', () => {
     changePassword: jest.fn().mockResolvedValue({ message: 'Password changed successfully' }),
   };
 
-  const mockAuthService = {
-    validateUser: jest.fn().mockResolvedValue(true),
-  };
-
   const mockAuthGuard = {
-    canActivate: jest.fn().mockReturnValue(true),
+    canActivate: jest.fn().mockResolvedValue(true),
   };
 
   beforeEach(async () => {
@@ -32,10 +27,6 @@ describe('UserController', () => {
         {
           provide: UserService,
           useValue: mockUserService,
-        },
-        {
-          provide: AuthService,
-          useValue: mockAuthService,
         },
         {
           provide: AuthGuard,

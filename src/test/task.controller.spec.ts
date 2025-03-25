@@ -1,11 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TaskController } from '../controllers/task.controller';
 import { TaskService } from '../services/task.service';
-import { AuthGuard } from '../guards/auth.guard';
-import { AuthService } from 'src/guards/auth.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Task } from '../entities/task.entity';
 import { InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 
 const mockTaskService = {
   getAllTasks: jest.fn().mockResolvedValue([]),
@@ -16,10 +15,6 @@ const mockTaskService = {
   toggleCompleteTask: jest.fn().mockResolvedValue({ id: 1, completed: true }),
   toggleArchiveTask: jest.fn().mockResolvedValue({ id: 1, archived: true }),
   deleteTask: jest.fn().mockResolvedValue({ id: 1, deleted: true }),
-};
-
-const mockAuthService = {
-  validateUser: jest.fn().mockResolvedValue(true),
 };
 
 describe('TaskController', () => {
@@ -36,10 +31,6 @@ describe('TaskController', () => {
         {
           provide: getRepositoryToken(Task),
           useValue: {},
-        },
-        {
-          provide: AuthService,
-          useValue: mockAuthService,
         },
         {
           provide: AuthGuard,
