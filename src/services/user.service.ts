@@ -24,7 +24,7 @@ export class UserService {
     private readonly userRepository: Repository<User>,
   ) { }
 
-  async getAllUsers(): Promise<User[]> {
+  async getAllUsers(): Promise<UserDTO[]> {
     try {
       return await this.userRepository.find();
     } catch (error) {
@@ -32,7 +32,7 @@ export class UserService {
     }
   }
 
-  async getUserById(userId: number): Promise<User> {
+  async getUserById(userId: number): Promise<UserDTO> {
     const foundUser = await this.userRepository.findOne({
       where: { id: userId },
     });
@@ -40,7 +40,7 @@ export class UserService {
     return foundUser;
   }
 
-  async getUserByEmail(email: string): Promise<User> {
+  async getUserByEmail(email: string): Promise<UserDTO> {
     const foundUser: User | null = await this.userRepository.findOne({
       where: { email },
     });
@@ -48,7 +48,7 @@ export class UserService {
     return foundUser;
   }
 
-  async createUser(userDTO: UserDTO): Promise<User> {
+  async createUser(userDTO: UserDTO): Promise<UserDTO> {
     const existingUser: User | null = await this.userRepository.findOne({
       where: { email: userDTO.email },
     });

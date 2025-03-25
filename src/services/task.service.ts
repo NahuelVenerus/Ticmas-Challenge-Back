@@ -20,11 +20,11 @@ export class TaskService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  async getAllTasks(): Promise<Task[]> {
+  async getAllTasks(): Promise<TaskDTO[]> {
     return await this.taskRepository.find();
   }
 
-  async getTaskById(taskId: number): Promise<Task> {
+  async getTaskById(taskId: number): Promise<TaskDTO> {
     const foundTask = await this.taskRepository.findOne({
       where: { id: taskId },
     });
@@ -32,13 +32,14 @@ export class TaskService {
     return foundTask;
   }
 
-  async getUserTasks(userId: number, archived: boolean): Promise<Task[]> {
-    return await this.taskRepository.find({
+  async getUserTasks(userId: number, archived: boolean): Promise<TaskDTO[]> {
+    const userTasks: TaskDTO[] = await this.taskRepository.find({
       where: {
         user: { id: userId },
         isArchived: archived,
       },
     });
+    return userTasks;
   }
 
   async createTask(taskDTO: TaskDTO): Promise<TaskDTO> {
@@ -56,7 +57,7 @@ export class TaskService {
     return { title: createdTask.title, description: createdTask.description, id: user.id } as TaskDTO;
   }
 
-  async editTask(taskId: number, taskEditDTO: TaskEditDTO): Promise<Task> {
+  async editTask(taskId: number, taskEditDTO: TaskEditDTO): Promise<TaskDTO> {
     const foundTask: Task = await this.getTaskById(taskId);
 
     const updatedTask: Partial<Task> = {};
@@ -77,14 +78,14 @@ export class TaskService {
     return await this.getTaskById(taskId);
   }
 
-  async toggleCompleteTask(taskId: number): Promise<Task> {
+  async toggleCompleteTask(taskId: number): Promise<TaskDTO> {
     const foundTask = await this.getTaskById(taskId);
     foundTask.isCompleted = !foundTask.isCompleted;
     await this.taskRepository.save(foundTask);
     return foundTask;
   }
 
-  async toggleArchiveTask(taskId: number): Promise<Task> {
+  async toggleArchiveTask(taskId: number): Promise<TaskDTO> {
     const foundTask = await this.getTaskById(taskId);
     foundTask.isArchived = !foundTask.isArchived;
     await this.taskRepository.save(foundTask);

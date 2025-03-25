@@ -17,9 +17,9 @@ export class UserController {
   @ApiOperation({ summary: 'Get all users', description: 'Retrieve a list of all registered users.' })
   @ApiResponse({ status: 200, description: 'Users retrieved successfully.' })
   @ApiResponse({ status: 500, description: 'Internal server error' })
-  getAllUsers() {
+  async getAllUsers(): Promise<UserDTO[]> {
     try {
-      return this.userService.getAllUsers();
+      return await this.userService.getAllUsers();
     } catch (error) {
       throw new InternalServerErrorException("Couldn't get users: " + error.message);
     }
@@ -30,7 +30,7 @@ export class UserController {
   @ApiResponse({ status: 200, description: 'User retrieved successfully.' })
   @ApiResponse({ status: 404, description: 'User not found.' })
   @ApiResponse({ status: 500, description: 'Internal server error' })
-  getUserById(@Param('userId') userId: number) {
+  async getUserById(@Param('userId') userId: number): Promise<UserDTO> {
     try {
       return this.userService.getUserById(userId);
     } catch (error) {
@@ -44,7 +44,7 @@ export class UserController {
   @ApiResponse({ status: 200, description: 'User retrieved successfully.' })
   @ApiResponse({ status: 404, description: 'User not found.' })
   @ApiResponse({ status: 500, description: 'Internal server error' })
-  getUserByEmail(@Param('email') email: string) {
+  async getUserByEmail(@Param('email') email: string): Promise<UserDTO>{
     try {
       return this.userService.getUserByEmail(email);
     } catch (error) {
@@ -57,7 +57,7 @@ export class UserController {
   @ApiOperation({ summary: 'Create user', description: 'Create a new user with the provided data.' })
   @ApiResponse({ status: 201, description: 'User created successfully.' })
   @ApiResponse({ status: 500, description: 'Internal server error' })
-  createUser(@Body() userDTO: UserDTO) {
+  async createUser(@Body() userDTO: UserDTO): Promise<UserDTO> {
     try {
       return this.userService.createUser(userDTO);
     } catch (error) {
@@ -70,7 +70,7 @@ export class UserController {
   @ApiResponse({ status: 200, description: 'User logged in successfully.' })
   @ApiResponse({ status: 401, description: 'Invalid credentials.' })
   @ApiResponse({ status: 500, description: 'Internal server error' })
-  userLogin(@Body() userLoginDTO: UserLoginDTO) {
+  async userLogin(@Body() userLoginDTO: UserLoginDTO): Promise<string> {
     try {
       return this.userService.loginUser(userLoginDTO);
     } catch (error) {
@@ -99,10 +99,10 @@ export class UserController {
   @ApiResponse({ status: 200, description: 'Password changed successfully.' })
   @ApiResponse({ status: 404, description: 'User not found.' })
   @ApiResponse({ status: 500, description: 'Internal server error' })
-  changePassword(
+  async changePassword(
     @Param('id') userId: number,
     @Body() userPasswordDTO: UserPasswordDTO,
-  ) {
+  ): Promise<boolean> {
     try {
       return this.userService.changePassword(userId, userPasswordDTO);
     } catch (error) {
@@ -114,7 +114,7 @@ export class UserController {
   @ApiOperation({ summary: 'Delete task', description: 'Permanently remove a task from the system.' })
   @ApiResponse({ status: 200, description: 'Task deleted successfully.' })
   @ApiResponse({ status: 404, description: 'Task not found.' })
-  async removeTaskPermanently(@Param('id') taskId: number) {
+  async removeTaskPermanently(@Param('id') taskId: number): Promise<boolean> {
     try {
       return await this.userService.deleteUser(taskId);
     } catch (error) {

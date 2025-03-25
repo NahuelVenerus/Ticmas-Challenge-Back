@@ -2,6 +2,7 @@ import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UseGuard
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { TaskDTO } from 'src/DTOs/task.dto';
 import { TaskEditDTO } from 'src/DTOs/task_edit.dto';
+import { Task } from 'src/entities/task.entity';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { TaskService } from 'src/services/task.service';
 
@@ -14,7 +15,7 @@ export class TaskController {
   @Get('/')
   @ApiOperation({ summary: 'Get all tasks', description: 'Retrieve a list of all tasks.' })
   @ApiResponse({ status: 200, description: 'Tasks retrieved successfully.' })
-  async getAllTasks() {
+  async getAllTasks(): Promise<TaskDTO[]> {
     try {
       return await this.taskService.getAllTasks();
     } catch (error) {
@@ -26,7 +27,7 @@ export class TaskController {
   @ApiOperation({ summary: 'Get task by ID', description: 'Retrieve a specific task by its ID.' })
   @ApiResponse({ status: 200, description: 'Task retrieved successfully.' })
   @ApiResponse({ status: 404, description: 'Task not found.' })
-  async getTaskById(@Param('id') taskId: number) {
+  async getTaskById(@Param('id') taskId: number): Promise<TaskDTO> {
     try {
       return await this.taskService.getTaskById(taskId);
     } catch (error) {
@@ -41,7 +42,7 @@ export class TaskController {
   async getUserTasks(
     @Param('userId') userId: number,
     @Query('archived') archived: boolean,
-  ) {
+  ): Promise<TaskDTO[]> {
     try {
       return await this.taskService.getUserTasks(userId, archived);
     } catch (error) {
@@ -52,7 +53,7 @@ export class TaskController {
   @Post('/create')
   @ApiOperation({ summary: 'Create new task', description: 'Create a new task with the provided data.' })
   @ApiResponse({ status: 201, description: 'Task created successfully.' })
-  async createTask(@Body() taskDTO: TaskDTO) {
+  async createTask(@Body() taskDTO: TaskDTO): Promise<TaskDTO> {
     try {
       return await this.taskService.createTask(taskDTO);
     } catch (error) {
@@ -64,7 +65,7 @@ export class TaskController {
   @ApiOperation({ summary: 'Edit task', description: 'Edit the details of an existing task.' })
   @ApiResponse({ status: 200, description: 'Task updated successfully.' })
   @ApiResponse({ status: 404, description: 'Task not found.' })
-  async editTask(@Param('id') taskId: number, @Body() taskEditDTO: TaskEditDTO) {
+  async editTask(@Param('id') taskId: number, @Body() taskEditDTO: TaskEditDTO): Promise<TaskDTO> {
     try {
       const taskToEdit: TaskEditDTO = {
         title: taskEditDTO.title,
@@ -79,7 +80,7 @@ export class TaskController {
   @Put('/complete/:id')
   @ApiOperation({ summary: 'Toggle task completion', description: 'Mark a task as completed or not.' })
   @ApiResponse({ status: 200, description: 'Task completion status toggled successfully.' })
-  async toggleCompleteTask(@Param('id') taskId: number) {
+  async toggleCompleteTask(@Param('id') taskId: number): Promise<TaskDTO> {
     try {
       return await this.taskService.toggleCompleteTask(taskId);
     } catch (error) {
@@ -90,7 +91,7 @@ export class TaskController {
   @Put('/archive/:id')
   @ApiOperation({ summary: 'Toggle task archive status', description: 'Archive or unarchive a task.' })
   @ApiResponse({ status: 200, description: 'Task archive status toggled successfully.' })
-  async toggleArchiveTask(@Param('id', ParseIntPipe) taskId: number) {
+  async toggleArchiveTask(@Param('id', ParseIntPipe) taskId: number): Promise<TaskDTO> {
     try {
       return await this.taskService.toggleArchiveTask(taskId);
     } catch (error) {
@@ -102,7 +103,7 @@ export class TaskController {
   @ApiOperation({ summary: 'Delete task', description: 'Permanently remove a task from the system.' })
   @ApiResponse({ status: 200, description: 'Task deleted successfully.' })
   @ApiResponse({ status: 404, description: 'Task not found.' })
-  async removeTaskPermanently(@Param('id') taskId: number) {
+  async removeTaskPermanently(@Param('id') taskId: number): Promise<boolean> {
     try {
       return await this.taskService.deleteTask(taskId);
     } catch (error) {

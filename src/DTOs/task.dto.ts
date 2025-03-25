@@ -39,6 +39,15 @@ export class TaskDTO {
   isCompleted?: boolean = false;
 
   @ApiProperty({
+    example: false,
+    description: 'Defines if the task is archived or not',
+    required: false,
+  })
+  @IsBoolean()
+  @IsOptional()
+  isArchived?: boolean = false;
+
+  @ApiProperty({
     example: 1,
     description: 'User ID assigned to the task',
   })
