@@ -77,9 +77,9 @@ describe('TaskController', () => {
   });
 
   it('should get tasks by user', async () => {
-    const result = await controller.getUserTasks(1, true);
+    const result = await controller.getUserTasks(1, true, true);
     expect(result).toEqual([]);
-    expect(mockTaskService.getUserTasks).toHaveBeenCalledWith(1, true);
+    expect(mockTaskService.getUserTasks).toHaveBeenCalledWith(1, true, true);
   });
 
   it('should create a new task', async () => {

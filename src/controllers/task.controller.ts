@@ -2,7 +2,6 @@ import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UseGuard
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { TaskDTO } from 'src/DTOs/task.dto';
 import { TaskEditDTO } from 'src/DTOs/task_edit.dto';
-import { Task } from 'src/entities/task.entity';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { TaskService } from 'src/services/task.service';
 
@@ -37,18 +36,20 @@ export class TaskController {
   }
 
   @Get('/user/:userId')
-  @ApiOperation({ summary: 'Get tasks by user', description: 'Retrieve tasks associated with a specific user.' })
+  @ApiOperation({ summary: 'Get tasks by user ID', description: 'Retrieve tasks associated with a specific user.' })
   @ApiResponse({ status: 200, description: 'Tasks retrieved successfully.' })
   async getUserTasks(
     @Param('userId') userId: number,
     @Query('archived') archived: boolean,
+    @Query('ascendant') isOrderAsc: boolean,
   ): Promise<TaskDTO[]> {
     try {
-      return await this.taskService.getUserTasks(userId, archived);
+      return await this.taskService.getUserTasks(userId, archived, isOrderAsc);
     } catch (error) {
       throw new InternalServerErrorException('Error retrieving user tasks: ' + error.message);
     }
   }
+  
 
   @Post('/create')
   @ApiOperation({ summary: 'Create new task', description: 'Create a new task with the provided data.' })

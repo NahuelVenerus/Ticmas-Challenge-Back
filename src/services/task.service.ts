@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TaskDTO } from 'src/DTOs/task.dto';
 import { TaskEditDTO } from 'src/DTOs/task_edit.dto';
@@ -32,12 +28,15 @@ export class TaskService {
     return foundTask;
   }
 
-  async getUserTasks(userId: number, archived: boolean): Promise<TaskDTO[]> {
+  async getUserTasks(userId: number, archived: boolean, isOrderAsc: boolean): Promise<TaskDTO[]> {
     const userTasks: TaskDTO[] = await this.taskRepository.find({
       where: {
         user: { id: userId },
         isArchived: archived,
       },
+      order: {
+        createdAt: isOrderAsc ? "ASC" : "DESC"
+      }
     });
     return userTasks;
   }
