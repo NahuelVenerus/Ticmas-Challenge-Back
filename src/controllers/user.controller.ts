@@ -19,7 +19,7 @@ export class UserController {
     try {
       return await this.userService.getAllUsers();
     } catch (error) {
-      throw new InternalServerErrorException("Couldn't get users: " + error.message);
+      throw new InternalServerErrorException("Couldn't get users: ",  error);
     }
   }
 
@@ -33,7 +33,7 @@ export class UserController {
       return this.userService.getUserById(userId);
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
-      throw new InternalServerErrorException('Error getting user: ' + error.message);
+      throw new InternalServerErrorException('Error getting user: ',  error);
     }
   }
 
@@ -47,7 +47,7 @@ export class UserController {
       return this.userService.getUserByEmail(email);
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
-      throw new InternalServerErrorException('Error getting user by email: ' + error.message);
+      throw new InternalServerErrorException('Error getting user by email: ',  error);
     }
   }
 
@@ -59,7 +59,7 @@ export class UserController {
     try {
       return this.userService.createUser(userDTO);
     } catch (error) {
-      throw new InternalServerErrorException('Failed to create user: ' + error.message);
+      throw new InternalServerErrorException('Failed to create user: ',  error);
     }
   }
 
@@ -72,7 +72,7 @@ export class UserController {
     try {
       return this.userService.loginUser(userLoginDTO);
     } catch (error) {
-      throw new InternalServerErrorException('Failed to login: ' + error.message);
+      throw new InternalServerErrorException('Failed to login: ',  error);
     }
   }
 
@@ -88,7 +88,7 @@ export class UserController {
     try {
       return this.userService.editUser(userId, userEditDTO);
     } catch (error) {
-      throw new InternalServerErrorException('Failed to edit user: ' + error.message);
+      throw new InternalServerErrorException('Failed to edit user: ',  error);
     }
   }
 
@@ -116,7 +116,7 @@ export class UserController {
     try {
       return await this.userService.deleteUser(taskId);
     } catch (error) {
-      throw new InternalServerErrorException('Error deleting task: ' + error.message);
+      throw new InternalServerErrorException('Error deleting task: ',  error);
     }
   }
 }

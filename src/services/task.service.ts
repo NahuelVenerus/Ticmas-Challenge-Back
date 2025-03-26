@@ -28,12 +28,16 @@ export class TaskService {
     return foundTask;
   }
 
-  async getUserTasks(userId: number, archived: boolean, order: string): Promise<TaskDTO[]> {
+  async getUserTasks(userId: string, archived: string, order: string, completed: string): Promise<TaskDTO[]> {
+    const isArchived: boolean = archived === "true";
+    const isCompleted: boolean = completed === "true";
+    
     let userTasks: TaskDTO[] = [];
     userTasks = await this.taskRepository.find({
       where: {
-        user: { id: userId },
-        isArchived: archived,
+        user: { id: parseInt(userId) },
+        isArchived,
+        isCompleted
       },
       order: {
         createdAt: order as FindOptionsOrderValue

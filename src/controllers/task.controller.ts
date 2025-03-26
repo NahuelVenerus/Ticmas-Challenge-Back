@@ -16,7 +16,7 @@ export class TaskController {
     try {
       return await this.taskService.getAllTasks();
     } catch (error) {
-      throw new InternalServerErrorException('Error retrieving tasks: ' + error.message);
+      throw new InternalServerErrorException('Error retrieving tasks: ',  error );
     }
   }
 
@@ -29,7 +29,7 @@ export class TaskController {
       return await this.taskService.getTaskById(taskId);
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
-      throw new InternalServerErrorException('Error retrieving task: ' + error.message);
+      throw new InternalServerErrorException('Error retrieving task: ',  error );
     }
   }
 
@@ -37,14 +37,15 @@ export class TaskController {
   @ApiOperation({ summary: 'Get tasks by user ID', description: 'Retrieve tasks associated with a specific user.' })
   @ApiResponse({ status: 200, description: 'Tasks retrieved successfully.' })
   async getUserTasks(
-    @Param('userId') userId: number,
-    @Query('archived') archived: boolean,
+    @Param('userId') userId: string,
+    @Query('completed') isCompleted: string,
     @Query('order') order: string,
+    @Query('archived') isArchived: string,
   ): Promise<TaskDTO[]> {
-    try {      
-      return await this.taskService.getUserTasks(userId, archived, order);
+    try {
+      return await this.taskService.getUserTasks(userId, isArchived, order, isCompleted);
     } catch (error) {
-      throw new InternalServerErrorException('Error retrieving user tasks: ' + error.message);
+      throw new InternalServerErrorException('Error retrieving user tasks: ',  error );
     }
   }
   
@@ -54,9 +55,11 @@ export class TaskController {
   @ApiResponse({ status: 201, description: 'Task created successfully.' })
   async createTask(@Body() taskDTO: TaskDTO): Promise<TaskDTO> {
     try {
+      console.log("TaskDTO: ", taskDTO);
+      
       return await this.taskService.createTask(taskDTO);
     } catch (error) {
-      throw new InternalServerErrorException('Error creating task: ' + error.message);
+      throw new InternalServerErrorException('Error creating task: ',  error );
     }
   }
 
@@ -72,7 +75,7 @@ export class TaskController {
       };
       return await this.taskService.editTask(taskId, taskToEdit);
     } catch (error) {
-      throw new InternalServerErrorException('Error editing task: ' + error.message);
+      throw new InternalServerErrorException('Error editing task: ',  error );
     }
   }
 
@@ -83,7 +86,7 @@ export class TaskController {
     try {
       return await this.taskService.toggleCompleteTask(taskId);
     } catch (error) {
-      throw new InternalServerErrorException('Error toggling task completion: ' + error.message);
+      throw new InternalServerErrorException('Error toggling task completion: ',  error );
     }
   }
 
@@ -94,7 +97,7 @@ export class TaskController {
     try {
       return await this.taskService.toggleArchiveTask(taskId);
     } catch (error) {
-      throw new InternalServerErrorException('Error toggling task archive status: ' + error.message);
+      throw new InternalServerErrorException('Error toggling task archive status: ',  error );
     }
   }
 
@@ -106,7 +109,7 @@ export class TaskController {
     try {
       return await this.taskService.deleteTask(taskId);
     } catch (error) {
-      throw new InternalServerErrorException('Error deleting task: ' + error.message);
+      throw new InternalServerErrorException('Error deleting task: ',  error );
     }
   }
 }
