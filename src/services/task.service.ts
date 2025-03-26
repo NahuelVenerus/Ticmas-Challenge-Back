@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TaskDTO } from 'src/DTOs/task.dto';
 import { TaskEditDTO } from 'src/DTOs/task_edit.dto';
@@ -14,7 +18,7 @@ export class TaskService {
 
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-  ) { }
+  ) {}
 
   async getAllTasks(): Promise<TaskDTO[]> {
     return await this.taskRepository.find();
@@ -28,25 +32,30 @@ export class TaskService {
     return foundTask;
   }
 
-  async getUserTasks(userId: string, archived: string, order: string, completed: string): Promise<TaskDTO[]> {
-    const isArchived: boolean = archived === "true";
-    const isCompleted: boolean = completed === "true";
-    
+  async getUserTasks(
+    userId: string,
+    archived: string,
+    order: string,
+    completed: string,
+  ): Promise<TaskDTO[]> {
+    const isArchived: boolean = archived === 'true';
+    const isCompleted: boolean = completed === 'true';
+
     let userTasks: TaskDTO[] = [];
     userTasks = await this.taskRepository.find({
       where: {
         user: { id: parseInt(userId) },
         isArchived,
-        isCompleted
+        isCompleted,
       },
       order: {
-        createdAt: order as FindOptionsOrderValue
-      }
+        createdAt: order as FindOptionsOrderValue,
+      },
     });
-    
+
     return userTasks;
   }
-  
+
   async createTask(taskDTO: TaskDTO): Promise<TaskDTO> {
     const user = await this.userRepository.findOne({
       where: { id: taskDTO.userId },
@@ -59,7 +68,11 @@ export class TaskService {
       user: user,
     });
     await this.taskRepository.save(createdTask);
-    return { title: createdTask.title, description: createdTask.description, id: user.id } as TaskDTO;
+    return {
+      title: createdTask.title,
+      description: createdTask.description,
+      id: user.id,
+    } as TaskDTO;
   }
 
   async editTask(taskId: number, taskEditDTO: TaskEditDTO): Promise<TaskDTO> {
@@ -100,13 +113,15 @@ export class TaskService {
   async deleteTask(taskId: number): Promise<boolean> {
     try {
       await this.getTaskById(taskId);
-      const deleteResult: DeleteResult = await this.taskRepository.delete({ id: taskId });
+      const deleteResult: DeleteResult = await this.taskRepository.delete({
+        id: taskId,
+      });
       if (!deleteResult.affected) throw new NotFoundException('Task not found');
 
       return true;
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
-      throw new InternalServerErrorException('Failed to delete Task')
+      throw new InternalServerErrorException('Failed to delete Task');
     }
   }
 }
