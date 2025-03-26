@@ -72,8 +72,11 @@ export class UserService {
         ...userDTO,
         password: hashedPassword,
       });
+      const response = await this.userRepository.save(createdUser);
 
-      return await this.userRepository.save(createdUser);
+      console.log(response);
+      
+      return response;
     } catch (error: unknown) {
       if (error instanceof BadRequestException) {
         throw error;
