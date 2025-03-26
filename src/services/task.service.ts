@@ -29,7 +29,6 @@ export class TaskService {
   }
 
   async getUserTasks(userId: number, archived: boolean, order: string): Promise<TaskDTO[]> {
-    console.log("is asc: ", order);
     let userTasks: TaskDTO[] = [];
     userTasks = await this.taskRepository.find({
       where: {
