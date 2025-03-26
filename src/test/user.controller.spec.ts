@@ -8,12 +8,22 @@ describe('UserController', () => {
 
   const mockUserService = {
     getAllUsers: jest.fn().mockResolvedValue([]),
-    getUserById: jest.fn().mockResolvedValue({ id: 1, email: 'test@example.com' }),
-    getUserByEmail: jest.fn().mockResolvedValue({ id: 1, email: 'test@example.com' }),
-    createUser: jest.fn().mockResolvedValue({ id: 1, email: 'test@example.com' }),
+    getUserById: jest
+      .fn()
+      .mockResolvedValue({ id: 1, email: 'test@example.com' }),
+    getUserByEmail: jest
+      .fn()
+      .mockResolvedValue({ id: 1, email: 'test@example.com' }),
+    createUser: jest
+      .fn()
+      .mockResolvedValue({ id: 1, email: 'test@example.com' }),
     loginUser: jest.fn().mockResolvedValue({ accessToken: 'mockAccessToken' }),
-    editUser: jest.fn().mockResolvedValue({ id: 1, email: 'updated@example.com' }),
-    changePassword: jest.fn().mockResolvedValue({ message: 'Password changed successfully' }),
+    editUser: jest
+      .fn()
+      .mockResolvedValue({ id: 1, email: 'updated@example.com' }),
+    changePassword: jest
+      .fn()
+      .mockResolvedValue({ message: 'Password changed successfully' }),
   };
 
   const mockAuthGuard = {
@@ -89,6 +99,9 @@ describe('UserController', () => {
     const userPasswordDTO = { newPassword: 'newpassword' };
     const result = await controller.changePassword(userId, userPasswordDTO);
     expect(result).toEqual({ message: 'Password changed successfully' });
-    expect(mockUserService.changePassword).toHaveBeenCalledWith(userId, userPasswordDTO);
+    expect(mockUserService.changePassword).toHaveBeenCalledWith(
+      userId,
+      userPasswordDTO,
+    );
   });
 });

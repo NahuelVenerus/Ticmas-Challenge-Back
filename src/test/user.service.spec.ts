@@ -2,7 +2,12 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { UserService } from '../services/user.service';
 import { User } from 'src/entities/user.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { BadRequestException, NotFoundException, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  NotFoundException,
+  InternalServerErrorException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { DeleteResult, Repository } from 'typeorm';
 import { UserLoginDTO } from 'src/DTOs/user_login_dto';
@@ -19,7 +24,7 @@ describe('UserService', () => {
       create: jest.fn(),
       save: jest.fn(),
       update: jest.fn(),
-      delete: jest.fn()
+      delete: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -37,7 +42,7 @@ describe('UserService', () => {
 
   afterEach(() => {
     delete process.env.JWT_SECRET;
-  })
+  });
 
   it('should be defined', () => {
     expect(service).toBeDefined();
@@ -55,9 +60,13 @@ describe('UserService', () => {
     });
 
     it('should throw an error if users cannot be retrieved', async () => {
-      (mockUserRepository.find as jest.Mock).mockRejectedValue(new Error('Error'));
+      (mockUserRepository.find as jest.Mock).mockRejectedValue(
+        new Error('Error'),
+      );
 
-      await expect(service.getAllUsers()).rejects.toThrowError(InternalServerErrorException);
+      await expect(service.getAllUsers()).rejects.toThrowError(
+        InternalServerErrorException,
+      );
     });
   });
 
@@ -69,26 +78,33 @@ describe('UserService', () => {
       const user = await service.getUserById(1);
 
       expect(user).toEqual(mockUser);
-      expect(mockUserRepository.findOne).toHaveBeenCalledWith({ where: { id: 1 } });
+      expect(mockUserRepository.findOne).toHaveBeenCalledWith({
+        where: { id: 1 },
+      });
     });
 
     it('should throw an error if user is not found', async () => {
       (mockUserRepository.findOne as jest.Mock).mockResolvedValue(null);
 
-      await expect(service.getUserById(1)).rejects.toThrowError(NotFoundException);
+      await expect(service.getUserById(1)).rejects.toThrowError(
+        NotFoundException,
+      );
     });
   });
 
   describe('createUser', () => {
     it('should create a new user', async () => {
-      const userDTO = { email: 'test@example.com', password: 'password123', name: 'John', lastname: 'Doe' };
+      const userDTO = {
+        email: 'test@example.com',
+        password: 'password123',
+        name: 'John',
+        lastname: 'Doe',
+      };
       const mockUser = { id: 1, ...userDTO, password: 'hashedPassword' };
 
       (mockUserRepository.findOne as jest.Mock).mockResolvedValue(null);
       (mockUserRepository.create as jest.Mock).mockReturnValue(mockUser);
       (mockUserRepository.save as jest.Mock).mockResolvedValue(mockUser);
-
-      const hashedPassword = await bcrypt.hash(userDTO.password, 10);
 
       const createdUser = await service.createUser(userDTO);
 
@@ -102,31 +118,56 @@ describe('UserService', () => {
   });
 
   it('should throw an error if user email already exists', async () => {
-    const userDTO = { email: 'test@example.com', password: 'password123', name: 'John', lastname: 'Doe' };
+    const userDTO = {
+      email: 'test@example.com',
+      password: 'password123',
+      name: 'John',
+      lastname: 'Doe',
+    };
     (mockUserRepository.findOne as jest.Mock).mockResolvedValue({ id: 1 });
 
-    await expect(service.createUser(userDTO)).rejects.toThrowError(BadRequestException);
+    await expect(service.createUser(userDTO)).rejects.toThrowError(
+      BadRequestException,
+    );
   });
 
   it('should throw an error if user data is not received', async () => {
     const userDTO = { email: 'test@example.com' };
-    await expect(service.createUser(userDTO)).rejects.toThrowError(BadRequestException);
+    await expect(service.createUser(userDTO)).rejects.toThrowError(
+      BadRequestException,
+    );
   });
 
   it('should throw an error if user creation fails', async () => {
-    const userDTO = { email: 'test@example.com', password: 'password123', name: 'John', lastname: 'Doe' };
+    const userDTO = {
+      email: 'test@example.com',
+      password: 'password123',
+      name: 'John',
+      lastname: 'Doe',
+    };
     (mockUserRepository.findOne as jest.Mock).mockResolvedValue(null);
     (mockUserRepository.create as jest.Mock).mockReturnValue({});
 
-    (mockUserRepository.save as jest.Mock).mockRejectedValue(new Error('Error'));
+    (mockUserRepository.save as jest.Mock).mockRejectedValue(
+      new Error('Error'),
+    );
 
-    await expect(service.createUser(userDTO)).rejects.toThrowError(InternalServerErrorException);
+    await expect(service.createUser(userDTO)).rejects.toThrowError(
+      InternalServerErrorException,
+    );
   });
 
   describe('loginUser', () => {
     it('should return a JWT token for valid credentials', async () => {
-      const userLoginDTO = { email: 'test@example.com', password: 'password123' };
-      const mockUser = { id: 1, email: 'test@example.com', password: await bcrypt.hash('password123', 10) };
+      const userLoginDTO = {
+        email: 'test@example.com',
+        password: 'password123',
+      };
+      const mockUser = {
+        id: 1,
+        email: 'test@example.com',
+        password: await bcrypt.hash('password123', 10),
+      };
 
       (mockUserRepository.findOne as jest.Mock).mockResolvedValue(mockUser);
       const token = await service.loginUser(userLoginDTO);
@@ -138,29 +179,49 @@ describe('UserService', () => {
       process.env.JWT_SECRET = undefined;
       delete process.env.JWT_SECRET;
 
-      const userLoginDTO: UserLoginDTO = { email: 'test@example.com', password: 'password123' };
+      const userLoginDTO: UserLoginDTO = {
+        email: 'test@example.com',
+        password: 'password123',
+      };
 
-      await expect(service.loginUser(userLoginDTO)).rejects.toThrow(InternalServerErrorException);
+      await expect(service.loginUser(userLoginDTO)).rejects.toThrow(
+        InternalServerErrorException,
+      );
     });
 
     it('should throw an error for incorrect credentials', async () => {
-      const userLoginDTO = { email: 'test@example.com', password: 'wrongpassword' };
-      const mockUser = { id: 1, email: 'test@example.com', password: await bcrypt.hash('password123', 10) };
+      const userLoginDTO = {
+        email: 'test@example.com',
+        password: 'wrongpassword',
+      };
+      const mockUser = {
+        id: 1,
+        email: 'test@example.com',
+        password: await bcrypt.hash('password123', 10),
+      };
 
       (mockUserRepository.findOne as jest.Mock).mockResolvedValue(mockUser);
 
-      await expect(service.loginUser(userLoginDTO)).rejects.toThrowError(UnauthorizedException);
+      await expect(service.loginUser(userLoginDTO)).rejects.toThrowError(
+        UnauthorizedException,
+      );
     });
   });
 
   describe('editUser', () => {
     it('should update and return user edit DTO', async () => {
-      const userEditDTO = { name: 'John', lastname: 'Doe', email: 'john.doe@example.com' };
+      const userEditDTO = {
+        name: 'John',
+        lastname: 'Doe',
+        email: 'john.doe@example.com',
+      };
       const mockUser = { id: 1, ...userEditDTO };
       const updatedUser = { ...userEditDTO };
 
       (mockUserRepository.findOne as jest.Mock).mockResolvedValue(mockUser);
-      (mockUserRepository.update as jest.Mock).mockResolvedValue({ affected: 1 });
+      (mockUserRepository.update as jest.Mock).mockResolvedValue({
+        affected: 1,
+      });
       (mockUserRepository.save as jest.Mock).mockResolvedValue(updatedUser);
 
       const result = await service.editUser(1, userEditDTO);
@@ -169,20 +230,35 @@ describe('UserService', () => {
     });
 
     it('should throw an error if user update fails', async () => {
-      const userEditDTO = { name: 'John', lastname: 'Doe', email: 'john.doe@example.com' };
+      const userEditDTO = {
+        name: 'John',
+        lastname: 'Doe',
+        email: 'john.doe@example.com',
+      };
       (mockUserRepository.findOne as jest.Mock).mockResolvedValue(null);
 
-      await expect(service.editUser(1, userEditDTO)).rejects.toThrowError(NotFoundException);
+      await expect(service.editUser(1, userEditDTO)).rejects.toThrowError(
+        NotFoundException,
+      );
     });
   });
 
   describe('changePassword', () => {
     it('should change the password successfully', async () => {
-      const userPasswordDTO = { currentPassword: 'password123', newPassword: 'newPassword123' };
-      const mockUser = { id: 1, password: await bcrypt.hash('password123', 10) };
+      const userPasswordDTO = {
+        currentPassword: 'password123',
+        newPassword: 'newPassword123',
+      };
+      const mockUser = {
+        id: 1,
+        password: await bcrypt.hash('password123', 10),
+      };
 
       (mockUserRepository.findOne as jest.Mock).mockResolvedValue(mockUser);
-      (mockUserRepository.save as jest.Mock).mockResolvedValue({ ...mockUser, password: await bcrypt.hash('newPassword123', 10) });
+      (mockUserRepository.save as jest.Mock).mockResolvedValue({
+        ...mockUser,
+        password: await bcrypt.hash('newPassword123', 10),
+      });
 
       const result = await service.changePassword(1, userPasswordDTO);
 
@@ -190,53 +266,75 @@ describe('UserService', () => {
     });
 
     it('should throw an error if current password is incorrect', async () => {
-      const userPasswordDTO = { currentPassword: 'wrongpassword', newPassword: 'newPassword123' };
-      const mockUser = { id: 1, password: await bcrypt.hash('password123', 10) };
+      const userPasswordDTO = {
+        currentPassword: 'wrongpassword',
+        newPassword: 'newPassword123',
+      };
+      const mockUser = {
+        id: 1,
+        password: await bcrypt.hash('password123', 10),
+      };
 
       (mockUserRepository.findOne as jest.Mock).mockResolvedValue(mockUser);
 
-      await expect(service.changePassword(1, userPasswordDTO)).rejects.toThrowError(UnauthorizedException);
+      await expect(
+        service.changePassword(1, userPasswordDTO),
+      ).rejects.toThrowError(UnauthorizedException);
     });
 
     it('should throw an error if new password is the same as the current password', async () => {
-      const userPasswordDTO = { currentPassword: 'password123', newPassword: 'password123' };
-      const mockUser = { id: 1, password: await bcrypt.hash('password123', 10) };
+      const userPasswordDTO = {
+        currentPassword: 'password123',
+        newPassword: 'password123',
+      };
+      const mockUser = {
+        id: 1,
+        password: await bcrypt.hash('password123', 10),
+      };
 
       (mockUserRepository.findOne as jest.Mock).mockResolvedValue(mockUser);
 
-      await expect(service.changePassword(1, userPasswordDTO)).rejects.toThrowError(BadRequestException);
+      await expect(
+        service.changePassword(1, userPasswordDTO),
+      ).rejects.toThrowError(BadRequestException);
     });
-  })
+  });
 
   it('should delete a user successfully', async () => {
     const userId = 1;
     const deleteResult: DeleteResult = { affected: 1, raw: [] };
-  
+
     (mockUserRepository.findOne as jest.Mock).mockResolvedValue({ id: userId });
     (mockUserRepository.delete as jest.Mock).mockResolvedValue(deleteResult);
-  
+
     const result = await service.deleteUser(userId);
     expect(result).toBe(true);
     expect(mockUserRepository.delete).toHaveBeenCalledWith({ id: userId });
   });
-  
-  
 
   it('should throw NotFoundException if no user is deleted', async () => {
     const userId = 1;
 
-    (mockUserRepository.delete as jest.Mock).mockResolvedValue({ affected: 0, raw: [] });
+    (mockUserRepository.delete as jest.Mock).mockResolvedValue({
+      affected: 0,
+      raw: [],
+    });
 
     await expect(service.deleteUser(userId)).rejects.toThrow(NotFoundException);
     await expect(service.deleteUser(userId)).rejects.toThrow(`User not found`);
   });
-  
 
   it('should throw InternalServerErrorException on repository error', async () => {
-    (mockUserRepository.findOne as jest.Mock).mockResolvedValue({ id: 1, name: 'John Doe' });
-    (mockUserRepository.delete as jest.Mock).mockRejectedValue(new Error('Database error'));
-  
-    await expect(service.deleteUser(1)).rejects.toThrow(InternalServerErrorException);
+    (mockUserRepository.findOne as jest.Mock).mockResolvedValue({
+      id: 1,
+      name: 'John Doe',
+    });
+    (mockUserRepository.delete as jest.Mock).mockRejectedValue(
+      new Error('Database error'),
+    );
+
+    await expect(service.deleteUser(1)).rejects.toThrow(
+      InternalServerErrorException,
+    );
   });
-  
 });

@@ -3,8 +3,10 @@ import { TaskController } from '../controllers/task.controller';
 import { TaskService } from '../services/task.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Task } from '../entities/task.entity';
-import { InternalServerErrorException, NotFoundException } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
+import {
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 
 const mockTaskService = {
   getAllTasks: jest.fn().mockResolvedValue([]),
@@ -31,10 +33,6 @@ describe('TaskController', () => {
         {
           provide: getRepositoryToken(Task),
           useValue: {},
-        },
-        {
-          provide: AuthGuard,
-          useValue: { canActivate: jest.fn().mockResolvedValue(true) },
         },
       ],
     }).compile();
@@ -67,10 +65,37 @@ describe('TaskController', () => {
     }
   });
 
-  it('should get tasks by user', async () => {
-    const result = await controller.getUserTasks(1, true, true);
+  it('should get tasks by user with query parameters', async () => {
+    const userId = '1';
+    const isCompleted = 'true';
+    const order = 'asc';
+    const isArchived = 'false';
+
+    const result = await controller.getUserTasks(
+      userId,
+      isCompleted,
+      order,
+      isArchived,
+    );
+
     expect(result).toEqual([]);
-    expect(mockTaskService.getUserTasks).toHaveBeenCalledWith(1, true, true);
+    expect(mockTaskService.getUserTasks).toHaveBeenCalledWith(
+      userId,
+      isArchived,
+      order,
+      isCompleted,
+    );
+  });
+
+  it('should throw InternalServerErrorException on service failure for getUserTasks', async () => {
+    mockTaskService.getUserTasks.mockRejectedValueOnce(
+      new Error('Service failure'),
+    );
+    try {
+      await controller.getUserTasks('1', 'false', 'asc', 'false');
+    } catch (error) {
+      expect(error).toBeInstanceOf(InternalServerErrorException);
+    }
   });
 
   it('should create a new task', async () => {
@@ -81,7 +106,10 @@ describe('TaskController', () => {
   });
 
   it('should edit a task', async () => {
-    const taskEditDTO = { title: 'Edited Task', description: 'Updated description' };
+    const taskEditDTO = {
+      title: 'Edited Task',
+      description: 'Updated description',
+    };
     const result = await controller.editTask(1, taskEditDTO);
     expect(result).toEqual({ id: 1, title: 'Edited Task' });
     expect(mockTaskService.editTask).toHaveBeenCalledWith(1, taskEditDTO);
@@ -106,7 +134,9 @@ describe('TaskController', () => {
   });
 
   it('should throw InternalServerErrorException on service failure', async () => {
-    mockTaskService.getAllTasks.mockRejectedValueOnce(new Error('Service failure'));
+    mockTaskService.getAllTasks.mockRejectedValueOnce(
+      new Error('Service failure'),
+    );
     try {
       await controller.getAllTasks();
     } catch (error) {

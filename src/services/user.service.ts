@@ -22,7 +22,7 @@ export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-  ) { }
+  ) {}
 
   async getAllUsers(): Promise<UserDTO[]> {
     try {
@@ -81,7 +81,10 @@ export class UserService {
 
   async loginUser(userLoginDTO: UserLoginDTO): Promise<string> {
     const jwtSecret: string | undefined = process.env.JWT_SECRET;
-    if (!jwtSecret) throw new InternalServerErrorException('JWT SECRET not defined in environment variables');
+    if (!jwtSecret)
+      throw new InternalServerErrorException(
+        'JWT SECRET not defined in environment variables',
+      );
     if (!userLoginDTO.email) throw new BadRequestException('Email is required');
 
     const foundUser: User = await this.getUserByEmail(userLoginDTO.email);
@@ -170,13 +173,15 @@ export class UserService {
   async deleteUser(userId: number): Promise<boolean> {
     try {
       await this.getUserById(userId);
-      const deleteResult: DeleteResult = await this.userRepository.delete({ id: userId });  
-      if (!deleteResult.affected) throw new NotFoundException('User not found');  
+      const deleteResult: DeleteResult = await this.userRepository.delete({
+        id: userId,
+      });
+      if (!deleteResult.affected) throw new NotFoundException('User not found');
 
       return true;
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
       throw new InternalServerErrorException('Failed to delete user');
     }
-  }  
+  }
 }
