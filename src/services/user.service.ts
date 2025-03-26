@@ -49,6 +49,9 @@ export class UserService {
   }
 
   async createUser(userDTO: UserDTO): Promise<UserDTO> {
+
+    console.log("Service user data: ", userDTO);
+    
     const existingUser: User | null = await this.userRepository.findOne({
       where: { email: userDTO.email },
     });
