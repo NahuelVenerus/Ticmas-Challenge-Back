@@ -4,7 +4,7 @@ import { TaskDTO } from 'src/DTOs/task.dto';
 import { TaskEditDTO } from 'src/DTOs/task_edit.dto';
 import { Task } from 'src/entities/task.entity';
 import { User } from 'src/entities/user.entity';
-import { DeleteResult, Repository } from 'typeorm';
+import { DeleteResult, FindOptionsOrderValue, Repository } from 'typeorm';
 
 @Injectable()
 export class TaskService {
@@ -28,16 +28,33 @@ export class TaskService {
     return foundTask;
   }
 
-  async getUserTasks(userId: number, archived: boolean, isOrderAsc: boolean): Promise<TaskDTO[]> {
-    const userTasks: TaskDTO[] = await this.taskRepository.find({
-      where: {
-        user: { id: userId },
-        isArchived: archived,
-      },
-      order: {
-        createdAt: isOrderAsc ? "ASC" : "DESC"
-      }
-    });
+  async getUserTasksAsc(userId: number, archived: boolean): Promise<TaskDTO[]> {    
+    let userTasks: TaskDTO[] = [];
+      userTasks = await this.taskRepository.find({
+        where: {
+          user: { id: userId },
+          isArchived: archived,
+        },
+        order: {
+          createdAt: "ASC"
+        }
+      });    
+      console.log(userTasks);
+    return userTasks;
+  }
+
+  async getUserTasksDesc(userId: number, archived: boolean): Promise<TaskDTO[]> {    
+    let userTasks: TaskDTO[] = [];
+      userTasks = await this.taskRepository.find({
+        where: {
+          user: { id: userId },
+          isArchived: archived,
+        },
+        order: {
+          createdAt: "DESC"
+        }
+      });
+      console.log(userTasks);      
     return userTasks;
   }
 

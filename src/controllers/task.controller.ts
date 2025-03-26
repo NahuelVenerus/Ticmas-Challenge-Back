@@ -1,5 +1,4 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UseGuards, Query, InternalServerErrorException, NotFoundException } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { TaskDTO } from 'src/DTOs/task.dto';
 import { TaskEditDTO } from 'src/DTOs/task_edit.dto';
@@ -7,7 +6,6 @@ import { TaskService } from 'src/services/task.service';
 
 @ApiTags('Tasks')
 @Controller('tasks')
-@UseGuards(AuthGuard('jwt'))
 export class TaskController {
   constructor(private readonly taskService: TaskService) {}
 
@@ -35,16 +33,29 @@ export class TaskController {
     }
   }
 
-  @Get('/user/:userId')
+  @Get('/user/asc/:userId')
   @ApiOperation({ summary: 'Get tasks by user ID', description: 'Retrieve tasks associated with a specific user.' })
   @ApiResponse({ status: 200, description: 'Tasks retrieved successfully.' })
-  async getUserTasks(
+  async getUserTasksAsc(
     @Param('userId') userId: number,
     @Query('archived') archived: boolean,
-    @Query('ascendant') isOrderAsc: boolean,
   ): Promise<TaskDTO[]> {
     try {
-      return await this.taskService.getUserTasks(userId, archived, isOrderAsc);
+      return await this.taskService.getUserTasksAsc(userId, archived);
+    } catch (error) {
+      throw new InternalServerErrorException('Error retrieving user tasks: ' + error.message);
+    }
+  }
+
+  @Get('/user/desc/:userId')
+  @ApiOperation({ summary: 'Get tasks by user ID', description: 'Retrieve tasks associated with a specific user.' })
+  @ApiResponse({ status: 200, description: 'Tasks retrieved successfully.' })
+  async getUserTasksDesc(
+    @Param('userId') userId: number,
+    @Query('archived') archived: boolean,
+  ): Promise<TaskDTO[]> {
+    try {      
+      return await this.taskService.getUserTasksDesc(userId, archived);
     } catch (error) {
       throw new InternalServerErrorException('Error retrieving user tasks: ' + error.message);
     }

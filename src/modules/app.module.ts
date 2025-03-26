@@ -5,9 +5,6 @@ import * as dotenv from 'dotenv';
 import { Task } from 'src/entities/task.entity';
 import { User } from 'src/entities/user.entity';
 import { UserModule } from './user.module';
-import { AuthGuard } from 'src/guards/auth.guard';
-import { APP_GUARD } from '@nestjs/core';
-import { AuthModule } from 'src/guards/auth.module';
 
 dotenv.config();
 
@@ -25,13 +22,6 @@ dotenv.config();
     }),
     TaskModule,
     UserModule,
-    AuthModule,
-  ],
-  providers: [
-    {
-      provide: APP_GUARD,
-      useClass: AuthGuard,
-    },
   ],
 })
 export class AppModule {}
