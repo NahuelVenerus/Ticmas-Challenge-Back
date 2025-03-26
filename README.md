@@ -32,43 +32,44 @@ El **Backend** de *Planify* se encarga de manejar toda la lógica de negocio y p
 
 2. **Instalar dependencias**:
 
-    con npm
+    con **npm**
 
     npm install
 
-    o con yarn:
+    o con **yarn**:
 
     yarn install
 
 3. **Configurar variables de entorno**:
 
-  DB_TYPE
-  DB_HOST
-  DB_PORT
-  DB_USER
-  DB_PASS
-  DB_NAME
-  JWT_SECRET
-  FRONT_BASE_ROUTE
-  DATABASE_URL
+- `DB_TYPE`
+- `DB_HOST`
+- `DB_PORT`
+- `DB_USER`
+- `DB_PASS`
+- `DB_NAME`
+- `JWT_SECRET`
+- `FRONT_BASE_ROUTE`
+- `DATABASE_URL`
+
 
 4. **Ejecutar en desarrollo**:    
 
-    Con npm:
+    con **npm**:
     
     npm start
 
-    o con yarn:
+    o con **yarn**:
 
     yarn start
 
 5. **Ejecutar en producción**:
 
-    Con npm:
+    con **npm**:
 
     npm run start:prod
 
-    O con yarn:
+    O con **yarn**:
 
     yarn build
 
@@ -76,10 +77,10 @@ El **Backend** de *Planify* se encarga de manejar toda la lógica de negocio y p
 
 5. **Comandos relacionados con la base de datos**:
 
-    Con npm:
+    con **npm**:
     
     npm run db:reset
 
-    o con yarn:
+    o con **yarn**:
 
     yarn db:reset
