@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, InternalServerErrorException, NotFoundException, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, InternalServerErrorException, NotFoundException, Param, Post, Put } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { UserDTO } from 'src/DTOs/user.dto';
 import { UserEditDTO } from 'src/DTOs/user_edit.dto';
@@ -19,7 +19,7 @@ export class UserController {
     try {
       return await this.userService.getAllUsers();
     } catch (error) {
-      throw new InternalServerErrorException("Couldn't get users: ",  error);
+      throw new InternalServerErrorException("Couldn't get users");
     }
   }
 
@@ -33,7 +33,7 @@ export class UserController {
       return this.userService.getUserById(userId);
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
-      throw new InternalServerErrorException('Error getting user: ',  error);
+      throw new InternalServerErrorException('Error getting user');
     }
   }
 
@@ -47,7 +47,7 @@ export class UserController {
       return this.userService.getUserByEmail(email);
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
-      throw new InternalServerErrorException('Error getting user by email: ',  error);
+      throw new InternalServerErrorException('Error getting user by email');
     }
   }
 
@@ -59,7 +59,7 @@ export class UserController {
     try {
       return this.userService.createUser(userDTO);
     } catch (error) {
-      throw new InternalServerErrorException('Failed to create user: ',  error);
+      throw new InternalServerErrorException('Failed to create user');
     }
   }
 
@@ -72,7 +72,7 @@ export class UserController {
     try {
       return this.userService.loginUser(userLoginDTO);
     } catch (error) {
-      throw new InternalServerErrorException('Failed to login: ',  error);
+      throw new InternalServerErrorException('Failed to login');
     }
   }
 
@@ -88,7 +88,7 @@ export class UserController {
     try {
       return this.userService.editUser(userId, userEditDTO);
     } catch (error) {
-      throw new InternalServerErrorException('Failed to edit user: ',  error);
+      throw new InternalServerErrorException('Failed to edit user');
     }
   }
 
@@ -116,7 +116,7 @@ export class UserController {
     try {
       return await this.userService.deleteUser(taskId);
     } catch (error) {
-      throw new InternalServerErrorException('Error deleting task: ',  error);
+      throw new InternalServerErrorException('Error deleting task');
     }
   }
 }

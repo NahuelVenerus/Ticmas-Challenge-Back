@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UseGuards, Query, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { TaskDTO } from 'src/DTOs/task.dto';
 import { TaskEditDTO } from 'src/DTOs/task_edit.dto';
@@ -15,8 +15,8 @@ export class TaskController {
   async getAllTasks(): Promise<TaskDTO[]> {
     try {
       return await this.taskService.getAllTasks();
-    } catch (error) {
-      throw new InternalServerErrorException('Error retrieving tasks: ',  error );
+    } catch (error: unknown) {
+      throw new InternalServerErrorException('Error retrieving tasks');
     }
   }
 
@@ -27,9 +27,9 @@ export class TaskController {
   async getTaskById(@Param('id') taskId: number): Promise<TaskDTO> {
     try {
       return await this.taskService.getTaskById(taskId);
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof NotFoundException) throw error;
-      throw new InternalServerErrorException('Error retrieving task: ',  error );
+      throw new InternalServerErrorException('Error retrieving task' );
     }
   }
 
@@ -44,8 +44,8 @@ export class TaskController {
   ): Promise<TaskDTO[]> {
     try {
       return await this.taskService.getUserTasks(userId, isArchived, order, isCompleted);
-    } catch (error) {
-      throw new InternalServerErrorException('Error retrieving user tasks: ',  error );
+    } catch (error: unknown) {
+      throw new InternalServerErrorException('Error retrieving user tasks');
     }
   }
   
@@ -58,8 +58,8 @@ export class TaskController {
       console.log("TaskDTO: ", taskDTO);
       
       return await this.taskService.createTask(taskDTO);
-    } catch (error) {
-      throw new InternalServerErrorException('Error creating task: ',  error );
+    } catch (error: unknown) {
+      throw new InternalServerErrorException('Error creating task' );
     }
   }
 
@@ -74,8 +74,8 @@ export class TaskController {
         description: taskEditDTO.description,
       };
       return await this.taskService.editTask(taskId, taskToEdit);
-    } catch (error) {
-      throw new InternalServerErrorException('Error editing task: ',  error );
+    } catch (error: unknown) {
+      throw new InternalServerErrorException('Error editing task' );
     }
   }
 
@@ -85,8 +85,8 @@ export class TaskController {
   async toggleCompleteTask(@Param('id') taskId: number): Promise<TaskDTO> {
     try {
       return await this.taskService.toggleCompleteTask(taskId);
-    } catch (error) {
-      throw new InternalServerErrorException('Error toggling task completion: ',  error );
+    } catch (error: unknown) {
+      throw new InternalServerErrorException('Error toggling task completion');
     }
   }
 
@@ -96,8 +96,8 @@ export class TaskController {
   async toggleArchiveTask(@Param('id', ParseIntPipe) taskId: number): Promise<TaskDTO> {
     try {
       return await this.taskService.toggleArchiveTask(taskId);
-    } catch (error) {
-      throw new InternalServerErrorException('Error toggling task archive status: ',  error );
+    } catch (error: unknown) {
+      throw new InternalServerErrorException('Error toggling task archive status');
     }
   }
 
@@ -108,8 +108,8 @@ export class TaskController {
   async removeTaskPermanently(@Param('id') taskId: number): Promise<boolean> {
     try {
       return await this.taskService.deleteTask(taskId);
-    } catch (error) {
-      throw new InternalServerErrorException('Error deleting task: ',  error );
+    } catch (error: unknown) {
+      throw new InternalServerErrorException('Error deleting task' );
     }
   }
 }
