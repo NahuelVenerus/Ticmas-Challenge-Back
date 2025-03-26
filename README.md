@@ -56,7 +56,7 @@ El **Backend** de *Planify* se encarga de manejar toda la lógica de negocio y p
 
     Con npm:
     
-    npm run start
+    npm start
 
     o con yarn:
 
