@@ -40,17 +40,16 @@ export class UserDTO {
   })
   @IsString()
   @IsNotEmpty()
-  @MinLength(8, { message: 'Password must have at least 8 characters' })
+  @MinLength(8, { message: 'La contraseña debe tener al menos 8 caracteres' })
   @Matches(/[A-Z]/, {
-    message: 'The password must contain at least one uppercase letter',
+    message: 'La contraseña debe contener al menos una letra mayúscula',
   })
   @Matches(/[a-z]/, {
-    message: 'The password must contain at least one lowercase letter',
+    message: 'La contraseña debe contener al menos una letra minúscula',
   })
-  @Matches(/\d/, { message: 'The password must contain at least one number' })
+  @Matches(/\d/, { message: 'La contraseña debe contener al menos un número' })
   @Matches(/[@$!%*?&.]/, {
-    message:
-      'The password must contain at least one special character (@, $, !, %, *, ?, &, .)',
+    message: 'La contraseña debe contener al menos un carácter especial (@, $, !, %, *, ?, &, .)',
   })
   password?: string;
 }
