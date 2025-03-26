@@ -95,8 +95,6 @@ export class UserController {
   
         throw new BadRequestException(errorMessage);
       }
-  
-      // En caso de error general, lanzamos una excepción interna
       throw new InternalServerErrorException('Failed to create user');
     }
   }

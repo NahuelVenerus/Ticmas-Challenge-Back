@@ -11,13 +11,13 @@ const password = process.env.DB_PASS;
 const database = process.env.DB_NAME;
 
 const AppDataSource = new DataSource({
-  type: 'postgres',  
-  url: `${type}://${username}:${password}@${host}:${port}/${database}`,
-  host: process.env.DB_HOST,
-  port: 5432,
-  username: process.env.DB_USER,
-  password: process.env.DB_PASS,
-  database: process.env.DB_NAME,
+  type: type,
+  url: process.env.DATABASE_URL,
+  host: host,
+  port: port,
+  username: username,
+  password: password,
+  database: database,
   entities: [__dirname + '/../entities/*.js'],
   migrations: [__dirname + '/migrations/*.ts'],
   synchronize: false,
