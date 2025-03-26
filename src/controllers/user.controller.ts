@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -79,18 +80,27 @@ export class UserController {
     description: 'Create a new user with the provided data.',
   })
   @ApiResponse({ status: 201, description: 'User created successfully.' })
+  @ApiResponse({ status: 400, description: 'Bad Request' })
   @ApiResponse({ status: 500, description: 'Internal server error' })
   async createUser(@Body() userDTO: UserDTO): Promise<UserDTO> {
     try {
-      console.log("User Data: ", userDTO);
-      
-      return this.userService.createUser(userDTO);
+      return await this.userService.createUser(userDTO);
     } catch (error) {
       console.error(error);
+  
+      if (error instanceof BadRequestException) {
+        const errorMessage = Array.isArray(error.message)
+          ? error.message.join(" ")
+          : error.message;
+  
+        throw new BadRequestException(errorMessage);
+      }
+  
+      // En caso de error general, lanzamos una excepción interna
       throw new InternalServerErrorException('Failed to create user');
     }
   }
-
+  
   @Post('/login')
   @ApiOperation({
     summary: 'User login',

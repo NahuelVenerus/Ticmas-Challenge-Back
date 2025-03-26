@@ -49,32 +49,39 @@ export class UserService {
   }
 
   async createUser(userDTO: UserDTO): Promise<UserDTO> {
-
-    console.log("Service user data: ", userDTO);
-    
     const existingUser: User | null = await this.userRepository.findOne({
       where: { email: userDTO.email },
     });
-
+  
     if (existingUser) {
       throw new BadRequestException('User email already exists');
     }
-
+  
     try {
       const userPassword = userDTO?.password;
-
+  
       if (!userPassword) {
         throw new BadRequestException('User data not received');
       }
 
+      const passwordErrors: string[] = [];
+      if (userPassword.length < 8) {
+        passwordErrors.push('Password must have at least 8 characters');
+      }
+      if (!/[A-Z]/.test(userPassword)) {
+        passwordErrors.push('The password must contain at least one uppercase letter');
+      }
+  
+      if (passwordErrors.length > 0) {
+        throw new BadRequestException(passwordErrors);
+      }
+  
       const hashedPassword = await bcrypt.hash(userPassword, 10);
       const createdUser = this.userRepository.create({
         ...userDTO,
         password: hashedPassword,
       });
       const response = await this.userRepository.save(createdUser);
-
-      console.log(response);
       
       return response;
     } catch (error: unknown) {

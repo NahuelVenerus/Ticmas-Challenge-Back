@@ -86,8 +86,6 @@ export class TaskController {
   @ApiResponse({ status: 201, description: 'Task created successfully.' })
   async createTask(@Body() taskDTO: TaskDTO): Promise<TaskDTO> {
     try {
-      console.log('TaskDTO: ', taskDTO);
-
       return await this.taskService.createTask(taskDTO);
     } catch (error: unknown) {
       console.error(error);
