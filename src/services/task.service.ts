@@ -14,7 +14,7 @@ export class TaskService {
 
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-  ) {}
+  ) { }
 
   async getAllTasks(): Promise<TaskDTO[]> {
     return await this.taskRepository.find();
@@ -28,36 +28,22 @@ export class TaskService {
     return foundTask;
   }
 
-  async getUserTasksAsc(userId: number, archived: boolean): Promise<TaskDTO[]> {    
+  async getUserTasks(userId: number, archived: boolean, order: string): Promise<TaskDTO[]> {
+    console.log("is asc: ", order);
     let userTasks: TaskDTO[] = [];
-      userTasks = await this.taskRepository.find({
-        where: {
-          user: { id: userId },
-          isArchived: archived,
-        },
-        order: {
-          createdAt: "ASC"
-        }
-      });    
-      console.log(userTasks);
+    userTasks = await this.taskRepository.find({
+      where: {
+        user: { id: userId },
+        isArchived: archived,
+      },
+      order: {
+        createdAt: order as FindOptionsOrderValue
+      }
+    });
+    
     return userTasks;
   }
-
-  async getUserTasksDesc(userId: number, archived: boolean): Promise<TaskDTO[]> {    
-    let userTasks: TaskDTO[] = [];
-      userTasks = await this.taskRepository.find({
-        where: {
-          user: { id: userId },
-          isArchived: archived,
-        },
-        order: {
-          createdAt: "DESC"
-        }
-      });
-      console.log(userTasks);      
-    return userTasks;
-  }
-
+  
   async createTask(taskDTO: TaskDTO): Promise<TaskDTO> {
     const user = await this.userRepository.findOne({
       where: { id: taskDTO.userId },
@@ -111,10 +97,10 @@ export class TaskService {
   async deleteTask(taskId: number): Promise<boolean> {
     try {
       await this.getTaskById(taskId);
-      const deleteResult: DeleteResult = await this.taskRepository.delete({id: taskId});
+      const deleteResult: DeleteResult = await this.taskRepository.delete({ id: taskId });
       if (!deleteResult.affected) throw new NotFoundException('Task not found');
 
-      return true;      
+      return true;
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
       throw new InternalServerErrorException('Failed to delete Task')

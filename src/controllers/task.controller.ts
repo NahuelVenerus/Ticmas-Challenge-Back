@@ -33,29 +33,16 @@ export class TaskController {
     }
   }
 
-  @Get('/user/asc/:userId')
+  @Get('/user/:userId')
   @ApiOperation({ summary: 'Get tasks by user ID', description: 'Retrieve tasks associated with a specific user.' })
   @ApiResponse({ status: 200, description: 'Tasks retrieved successfully.' })
-  async getUserTasksAsc(
+  async getUserTasks(
     @Param('userId') userId: number,
     @Query('archived') archived: boolean,
-  ): Promise<TaskDTO[]> {
-    try {
-      return await this.taskService.getUserTasksAsc(userId, archived);
-    } catch (error) {
-      throw new InternalServerErrorException('Error retrieving user tasks: ' + error.message);
-    }
-  }
-
-  @Get('/user/desc/:userId')
-  @ApiOperation({ summary: 'Get tasks by user ID', description: 'Retrieve tasks associated with a specific user.' })
-  @ApiResponse({ status: 200, description: 'Tasks retrieved successfully.' })
-  async getUserTasksDesc(
-    @Param('userId') userId: number,
-    @Query('archived') archived: boolean,
+    @Query('order') order: string,
   ): Promise<TaskDTO[]> {
     try {      
-      return await this.taskService.getUserTasksDesc(userId, archived);
+      return await this.taskService.getUserTasks(userId, archived, order);
     } catch (error) {
       throw new InternalServerErrorException('Error retrieving user tasks: ' + error.message);
     }
