@@ -82,8 +82,6 @@ export class UserController {
   @ApiResponse({ status: 500, description: 'Internal server error' })
   async createUser(@Body() userDTO: UserDTO): Promise<UserDTO> {
     try {
-      console.log("User Data: ", userDTO);
-      
       return this.userService.createUser(userDTO);
     } catch (error) {
       console.error(error);

@@ -49,9 +49,6 @@ export class UserService {
   }
 
   async createUser(userDTO: UserDTO): Promise<UserDTO> {
-
-    console.log("Service user data: ", userDTO);
-    
     const existingUser: User | null = await this.userRepository.findOne({
       where: { email: userDTO.email },
     });
@@ -73,9 +70,6 @@ export class UserService {
         password: hashedPassword,
       });
       const response = await this.userRepository.save(createdUser);
-
-      console.log(response);
-      
       return response;
     } catch (error: unknown) {
       if (error instanceof BadRequestException) {
