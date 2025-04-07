@@ -1,13 +1,29 @@
-import { Body, Post, InternalServerErrorException, BadRequestException, UseGuards, Controller } from '@nestjs/common';
+import { Body, Post, InternalServerErrorException, BadRequestException, Controller, Get, Req } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UserDTO } from 'src/DTOs/user.dto';
 import { UserLoginDTO } from 'src/DTOs/user_login_dto';
 import { AuthService } from './auth.service';
+import { Request } from 'express';
 
-@ApiTags('Users')
+interface AuthRequest extends Request {
+  user: {
+    userId: number,
+    email: string
+  }
+}
+
+@ApiTags('Auth')
 @Controller('auth')
-export class UserController {
+export class AuthController {
   constructor(private readonly authService: AuthService) {}
+
+@Get('validate')
+validateToken(@Req() req: AuthRequest) {
+  return {
+    success: true,
+    data: req.user
+  }
+}
 
 @Post('/create')
   @ApiOperation({

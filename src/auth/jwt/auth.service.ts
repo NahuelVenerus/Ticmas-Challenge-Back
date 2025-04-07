@@ -6,14 +6,16 @@ import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
 import { User } from "src/entities/user.entity";
 import { Repository } from "typeorm";
+import { InjectRepository } from "@nestjs/typeorm";
 
 @Injectable()
 export class AuthService {
-  constructor(
-    private readonly userRepository: Repository<User>, 
-    private readonly userService: UserService
-) {}
-
+    constructor(
+        @InjectRepository(User)
+        private readonly userRepository: Repository<User>,
+        private readonly userService: UserService
+      ) {}
+      
   async createUser(userDTO: UserDTO): Promise<UserDTO> {
     const existingUser: User | null = await this.userRepository.findOne({
       where: { email: userDTO.email },

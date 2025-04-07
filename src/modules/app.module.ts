@@ -5,6 +5,7 @@ import * as dotenv from 'dotenv';
 import { Task } from 'src/entities/task.entity';
 import { User } from 'src/entities/user.entity';
 import { UserModule } from './user.module';
+import { AuthModule } from './auth.module';
 
 dotenv.config();
 
@@ -22,6 +23,7 @@ dotenv.config();
     }),
     TaskModule,
     UserModule,
+    AuthModule
   ],
 })
 export class AppModule {}
