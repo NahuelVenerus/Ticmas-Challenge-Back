@@ -1,22 +1,12 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  ParseIntPipe,
-  Post,
-  Put,
-  Query,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query, InternalServerErrorException, NotFoundException, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/auth/jwt/jwt.guard';
 import { TaskDTO } from 'src/DTOs/task.dto';
 import { TaskEditDTO } from 'src/DTOs/task_edit.dto';
 import { TaskService } from 'src/services/task.service';
 
 @ApiTags('Tasks')
+@UseGuards(JwtAuthGuard)
 @Controller('tasks')
 export class TaskController {
   constructor(private readonly taskService: TaskService) {}
