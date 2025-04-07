@@ -23,7 +23,8 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
 
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
-  console.log(process.env.FRONT_BASE_ROUTE);
+
+  console.log(`App running on PORT: ${process.env.DB_PORT}`);
   await app.listen(process.env.DB_PORT ?? 3000);
 }
 void bootstrap();
